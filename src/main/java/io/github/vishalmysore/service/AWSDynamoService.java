@@ -33,6 +33,8 @@ public class AWSDynamoService {
     private static String accessKey;
     private static String secretKey;
     private static String TABLE_NAME ="links";
+    private static String USAGE_TABLE_NAME ="usage"; //should hold the rest calls and the ipaddress and time of the call
+
     // AWS Region (Set this to the region you're using)
     private static final Region REGION = Region.US_EAST_1;
 
@@ -59,9 +61,31 @@ public class AWSDynamoService {
 
             log.info("DynamoDbClient initialized for region: " + REGION.id());
             createLinksTable();
+            createUsageTable();
         }
     }
+    @Async
+    public void insertUsageData(String restCallId, String ipAddress, String timestamp) {
+        try {
+            // Prepare the data for insertion
+            Map<String, AttributeValue> item = new HashMap<>();
+            item.put("restCallId", AttributeValue.builder().s(restCallId).build());
+            item.put("ipaddress", AttributeValue.builder().s(ipAddress).build());
+            item.put("timestamp", AttributeValue.builder().s(timestamp).build());
 
+            // Insert the item into the 'usage' table
+            PutItemRequest putItemRequest = PutItemRequest.builder()
+                    .tableName(USAGE_TABLE_NAME)
+                    .item(item)
+                    .build();
+
+            dynamoDbClient.putItem(putItemRequest);
+
+            log.info("Successfully inserted data into 'usage' table.");
+        } catch (DynamoDbException e) {
+            log.info("Failed to insert data into 'usage' table: " + e.getMessage());
+        }
+    }
     @Async
     public void saveOrUpdateLink(String url, String data) {
         String id = generateSHA256Hash(url); // Unique ID based on URL
@@ -234,6 +258,86 @@ public class AWSDynamoService {
             log.info("Waiting for Table 'links' to be created in region: " + REGION.id());
             waitForTableToBecomeActive(dynamoDbClient,TABLE_NAME);
             log.info("Table 'links' created successfully in region: " + REGION.id());
+            log.info("Table description: " + createTableResponse.tableDescription().tableName());
+
+        } catch (SdkException e) {
+            log.severe("Error occurred while creating table: " + e.getMessage());
+        }
+    }
+
+    private void createUsageTable() {
+        try {
+            if (dynamoDbClient == null) {
+                log.severe("DynamoDbClient is not initialized. Ensure that init() is called first.");
+                return;
+            }
+
+            // Check if the table 'links' already exists
+            ListTablesRequest listTablesRequest = ListTablesRequest.builder().build();
+            ListTablesResponse listTablesResponse = dynamoDbClient.listTables(listTablesRequest);
+            if (listTablesResponse.tableNames().contains(USAGE_TABLE_NAME)) {
+                log.info("Table 'links' already exists. Skipping creation.");
+                return;
+            }
+
+            // Define the table schema if not found
+            CreateTableRequest createTableRequest = CreateTableRequest.builder()
+                    .tableName(USAGE_TABLE_NAME)
+                    .keySchema(
+                            KeySchemaElement.builder()
+                                    .attributeName("restCallId")
+                                    .keyType(KeyType.HASH)  // Partition key
+                                    .build()
+                    )
+                    .attributeDefinitions(
+                            AttributeDefinition.builder()
+                                    .attributeName("restCallId")
+                                    .attributeType(ScalarAttributeType.S)  // String type for id
+                                    .build(),
+                            AttributeDefinition.builder()
+                                    .attributeName("ipaddress")
+                                    .attributeType(ScalarAttributeType.S)  // String type for timestamp
+                                    .build()
+                    )
+                    .provisionedThroughput(
+                            ProvisionedThroughput.builder()
+                                    .readCapacityUnits(5L)
+                                    .writeCapacityUnits(5L)
+                                    .build()
+                    )
+                    // Adding GSI for lastUsed
+                    .globalSecondaryIndexes(
+                            GlobalSecondaryIndex.builder()
+                                    .indexName("ipaddressIndex")
+                                    .keySchema(
+                                            KeySchemaElement.builder()
+                                                    .attributeName("ipaddress")
+                                                    .keyType(KeyType.HASH)  // Partition key of the GSI
+                                                    .build(),
+                                            KeySchemaElement.builder()
+                                                    .attributeName("restCallId")
+                                                    .keyType(KeyType.RANGE)  // Sort key of the GSI
+                                                    .build()
+                                    )
+                                    .projection(Projection.builder()
+                                            .projectionType(ProjectionType.ALL)  // Include all attributes in the index
+                                            .build())
+                                    .provisionedThroughput(
+                                            ProvisionedThroughput.builder()
+                                                    .readCapacityUnits(5L)
+                                                    .writeCapacityUnits(5L)
+                                                    .build()
+                                    )
+                                    .build()
+                    )
+                    .build();
+
+// Create the table
+            CreateTableResponse createTableResponse = dynamoDbClient.createTable(createTableRequest);
+            System.out.println("Table created: " + createTableResponse.tableDescription().tableName());
+            log.info("Waiting for Table 'usage' to be created in region: " + REGION.id());
+            waitForTableToBecomeActive(dynamoDbClient,USAGE_TABLE_NAME);
+            log.info("Table 'usage' created successfully in region: " + REGION.id());
             log.info("Table description: " + createTableResponse.tableDescription().tableName());
 
         } catch (SdkException e) {

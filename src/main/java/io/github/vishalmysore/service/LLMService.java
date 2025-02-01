@@ -40,4 +40,10 @@ public class LLMService {
         String prompt = "Can you build 10 multiple choice questions for the following topic -{ " + data + "} in Json format, the json should contain only these fields- questionId,questionText,answerChoices,correctAnswer\n";
         return callLLM(prompt);
     }
+
+    public String fixJson(String json){
+        String prompt = "Can you fix the following json so that i can parse it properly - \n{{" + json + " }}\n";
+        return callLLM(json);
+    }
+
 }

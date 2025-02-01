@@ -50,7 +50,8 @@ public class EasyQContoller {
          }
          dynamoService.saveOrUpdateLink(prompt,webData);
      } else {
-         llmService.buildQuestionsForTopic(prompt);
+         log.info("Prompt is not a link");
+         jsonQustions =  llmService.buildQuestionsForTopic(prompt);
          if (jsonQustions.contains("```json") && jsonQustions.contains("```")) {
              int startIndex = jsonQustions.indexOf("```json") + 7; // Move past ```json
              int endIndex = jsonQustions.indexOf("```", startIndex); // Find closing ```
@@ -68,7 +69,18 @@ public class EasyQContoller {
             // Convert the string to a list of Question objects
             questions = objectMapper.readValue(jsonQustions, new TypeReference<List<Question>>(){});
         } catch (Exception e) {
-            log.severe("Error parsing questions: " + e.getMessage());
+            log.info("I got some issues let me try again on more time");
+            jsonQustions = llmService.fixJson(jsonQustions);
+            try {
+                // Assuming jsonQuestions is now a JSON string containing an array of questions
+                ObjectMapper objectMapper = new ObjectMapper();
+                // Convert the string to a list of Question objects
+                questions = objectMapper.readValue(jsonQustions, new TypeReference<List<Question>>(){});
+            } catch (Exception e1) {
+                log.severe("LLM failed to generate questions");
+
+            }
+
         }
      return jsonQustions;
     }
