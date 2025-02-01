@@ -116,6 +116,18 @@
             <version>1.18.30</version>
             <scope>provided</scope>
         </dependency>
+        <!-- Spring Security dependency for Maven -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>5.0.0</version> <!-- Replace with the latest version -->
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
     <build>

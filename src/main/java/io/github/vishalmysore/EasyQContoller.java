@@ -7,6 +7,7 @@ import io.github.vishalmysore.service.ScraperService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Log
 @RestController
+@RequestMapping("/api")
 public class EasyQContoller {
 
     @Autowired
@@ -27,7 +29,7 @@ public class EasyQContoller {
 
     @GetMapping("/getQuestions")
     public String getQuestions(@RequestParam("prompt") String prompt) {
-        log.info("rceived "+prompt);
+        log.info("received "+prompt);
      String jsonQustions = null;
      if(prompt.startsWith("https://") || prompt.startsWith("http://")) {
 
@@ -66,6 +68,6 @@ public class EasyQContoller {
 
     @GetMapping("/getTrendingAll")
     public List<Link> getTrendingAll() {
-        return dynamoService.getTrendingArticlesInLastHour();
+        return dynamoService.getAllTimeTrendingArticles();
     }
 }
