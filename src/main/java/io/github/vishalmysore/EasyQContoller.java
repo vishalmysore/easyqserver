@@ -1,6 +1,9 @@
 package io.github.vishalmysore;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.vishalmysore.data.Link;
+import io.github.vishalmysore.data.Question;
 import io.github.vishalmysore.service.AWSDynamoService;
 import io.github.vishalmysore.service.LLMService;
 import io.github.vishalmysore.service.ScraperService;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Log
@@ -57,7 +61,15 @@ public class EasyQContoller {
              }
          }
      }
-
+        List<Question> questions = new ArrayList<>();
+        try {
+            // Assuming jsonQuestions is now a JSON string containing an array of questions
+            ObjectMapper objectMapper = new ObjectMapper();
+            // Convert the string to a list of Question objects
+            questions = objectMapper.readValue(jsonQustions, new TypeReference<List<Question>>(){});
+        } catch (Exception e) {
+            log.severe("Error parsing questions: " + e.getMessage());
+        }
      return jsonQustions;
     }
 

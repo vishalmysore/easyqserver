@@ -30,12 +30,14 @@ public class LLMService {
         return result;
     }
 
+
+
     public String buildQuestionsForLink(String data){
-        String prompt = "Can you build 10 multiple choice questions from the following data - \n{{" + data + " }}\n in Json format, the json should contain IDOfQuestion, TextofQuestion, Options, CorrectOption\n";
+        String prompt = "Can you build 10 multiple choice questions from the following data - \n{{" + data + " }}\n in Json format, the json should contain only these fields- questionId,questionText,answerChoices,correctAnswer\n";
         return callLLM(prompt);
     }
     public String buildQuestionsForTopic(String data){
-        String prompt = "Can you build 10 multiple choice questions for the following topic -{ " + data + "} in Json format, the json should contain IDOfQuestion, TextofQuestion, Options, CorrectOption\n";
+        String prompt = "Can you build 10 multiple choice questions for the following topic -{ " + data + "} in Json format, the json should contain only these fields- questionId,questionText,answerChoices,correctAnswer\n";
         return callLLM(prompt);
     }
 }

@@ -55,7 +55,7 @@ public class HostFilter implements Filter {
 
 
         // Check if the Host and IP are allowed
-        if (origin != null && hostValidator.isAllowedHost(origin) ) {
+       if (origin != null && hostValidator.isAllowedHost(origin) ) {
             // Allow the request to continue if both host and IP are valid
             chain.doFilter(request, response);
         } else {
@@ -63,6 +63,8 @@ public class HostFilter implements Filter {
             response.getWriter().write("Access Denied: Invalid Host or IP.");
             response.getWriter().flush();
         }
+
+
     }
 
     @Override
