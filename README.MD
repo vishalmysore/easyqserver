@@ -10,7 +10,7 @@
 To enable EasyQZ for your article, all you need to do is add the following link inside your article. You don't need to do anything else:
 
 ```html
-<a href="https://vishalmysore.github.io/easyq/" target="_blank">
+<a href="https://vishalmysore.github.io/easyqz/" target="_blank">
   Test with EasyQZ
 </a>
 ```
