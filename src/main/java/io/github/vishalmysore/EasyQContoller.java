@@ -32,7 +32,7 @@ public class EasyQContoller {
     AWSDynamoService dynamoService;
 
     @GetMapping("/getQuestions")
-    public String getQuestions(@RequestParam("prompt") String prompt, int difficulty) {
+    public String getQuestions(@RequestParam("prompt") String prompt,@RequestParam("difficulty")  int difficulty) {
         log.info("received "+prompt);
      String jsonQustions = null;
      if(prompt.startsWith("https://") || prompt.startsWith("http://")) {
