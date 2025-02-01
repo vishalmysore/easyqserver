@@ -54,7 +54,7 @@ public class HostFilter implements Filter {
         }
 
         // Check if the Host and IP are allowed
-        if (host != null && hostValidator.isAllowedHost(host) && clientIp != null && ipValidator.isAllowedIp(clientIp)) {
+        if (origin != null && hostValidator.isAllowedHost(origin) ) {
             // Allow the request to continue if both host and IP are valid
             chain.doFilter(request, response);
         } else {

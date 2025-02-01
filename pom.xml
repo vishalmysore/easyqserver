@@ -11,13 +11,12 @@
     </parent>
     <groupId>io.github.vishalmysore</groupId>
     <artifactId>easyQServer</artifactId>
-    <version>0.2.3</version>
+    <version>0.2.4</version>
     <name>Tools For Artificial Intelligence</name>
     <description>
-        Tools4Ai is Java Agentic AI Framework. Connect Various Tools directly into AI LLM. This is 100% Java implementation of Large Action Model or LLM Agent. It can work with Gemini, OpenAI , LocalAI or any locally hosted LLM
-        Integrate AI with enterprise tools or external tools, converting natural language prompts into actions. Actions could be Java Methods, Classes, Http endpoints, Shell scripts , Swagger url or more.
+        EasyQZ is an AI Powered quiz generation tool that allows users to generate quizzes from any article, link, topic, or custom text. Whether you're a student, educator, or professional, EasyQ helps you test your knowledge, compete with others, and discover trending topics.
     </description>
-    <url>https://github.com/vishalmysore/Tools4AI</url>
+    <url>https://github.com/vishalmysore/easyqz</url>
     <licenses>
         <license>
             <name>MIT License</name>
@@ -33,9 +32,9 @@
         </developer>
     </developers>
     <scm>
-        <connection>scm:git:git://github.com/vishalmysore/Tools4AI.git</connection>
-        <developerConnection>scm:git:ssh://github.com:vishalmysore/Tools4AI.git</developerConnection>
-        <url>http://github.com/vishalmysore/Tools4AI/tree/master</url>
+        <connection>scm:git:git://github.com/vishalmysore/easyqz.git</connection>
+        <developerConnection>scm:git:ssh://github.com:vishalmysore/easyqz.git</developerConnection>
+        <url>http://github.com/vishalmysore/easyqz/tree/master</url>
     </scm>
     <properties>
         <java.version>17</java.version>
@@ -196,6 +195,19 @@
                             <keyname>${mykey}</keyname>
                             <passphraseServerId>myid</passphraseServerId>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
