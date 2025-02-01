@@ -12,12 +12,12 @@ import java.io.IOException;
 public class HostFilter implements Filter {
 
     private final HostValidator hostValidator;
-    private final IpValidator ipValidator;
+
 
     // Constructor
-    public HostFilter(HostValidator hostValidator, IpValidator ipValidator) {
+    public HostFilter(HostValidator hostValidator) {
         this.hostValidator = hostValidator;
-        this.ipValidator = ipValidator;
+
     }
 
     @Override
@@ -52,6 +52,7 @@ public class HostFilter implements Filter {
         if (forwardedFor != null) {
             clientIp = forwardedFor.split(",")[0];  // Get the first IP in case of proxy chain
         }
+
 
         // Check if the Host and IP are allowed
         if (origin != null && hostValidator.isAllowedHost(origin) ) {

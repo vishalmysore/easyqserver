@@ -8,9 +8,9 @@ import org.springframework.context.annotation.Configuration;
 public class FilterConfig {
 
     @Bean
-    public FilterRegistrationBean<HostFilter> loggingFilter(HostValidator hostValidator,IpValidator ipValidator) {
+    public FilterRegistrationBean<HostFilter> loggingFilter(HostValidator hostValidator) {
         FilterRegistrationBean<HostFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new HostFilter(hostValidator,ipValidator));
+        registrationBean.setFilter(new HostFilter(hostValidator));
         registrationBean.addUrlPatterns("/api/*"); // Apply filter only to API endpoints
         return registrationBean;
     }

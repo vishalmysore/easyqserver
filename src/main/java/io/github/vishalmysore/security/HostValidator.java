@@ -17,7 +17,15 @@ public class HostValidator {
     public void init() {
         // Initialize the allowed hosts array after the value is injected
         if (allowedHosts != null) {
+            // Split the allowedHosts string into an array
             hostsArray = allowedHosts.split(",");
+
+            // Print the allowed hosts and hosts array for debugging
+            log.info("Allowed Hosts: " + allowedHosts);
+            log.info("Hosts Array: ");
+            for (String host : hostsArray) {
+                log.info(host);
+            }
         }
     }
 
@@ -27,6 +35,7 @@ public class HostValidator {
         if (hostsArray != null) {
             for (String allowedHost : hostsArray) {
                 if (allowedHost.trim().equals(host)) {
+                    log.info("Host is allowed");
                     return true;
                 }
             }
