@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class HostValidator {
 
-    @Value("${allowed.hosts}")
+    @Value("${allowedhosts}")
     private String allowedHosts;
 
     private String[] hostsArray;

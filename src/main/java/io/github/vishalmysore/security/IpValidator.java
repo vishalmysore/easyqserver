@@ -13,7 +13,7 @@ import java.util.Set;
 @Component
 public class IpValidator {
 
-    @Value("${allowed.ip}")
+    @Value("${allowedip}")
     private String allowedIPs;
 
     private Set<String> allowedIpsSet;

@@ -1,4 +1,4 @@
-FROM openjdk:17
+FROM openjdk:18
 WORKDIR ai
 
 ADD easyQServer-0.2.3.jar /ai/easyQServer-0.2.3.jar
