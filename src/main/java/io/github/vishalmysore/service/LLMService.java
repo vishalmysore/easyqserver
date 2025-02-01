@@ -32,12 +32,28 @@ public class LLMService {
 
 
 
-    public String buildQuestionsForLink(String data){
+    public String buildQuestionsForLink(String data, int difficulty){
         String prompt = "Can you build 10 multiple choice questions from the following data - \n{{" + data + " }}\n in Json format, the json should contain only these fields- questionId,questionText,answerChoices,correctAnswer\n";
+        prompt = enhancePrompt(difficulty, prompt);
         return callLLM(prompt);
     }
-    public String buildQuestionsForTopic(String data){
+
+    private static String enhancePrompt(int difficulty, String prompt) {
+        if(difficulty == 2) {
+            prompt =prompt +" please make sure questions are medium difficulty ";
+        }
+        if(difficulty == 3) {
+            prompt =prompt +" please make sure questions are hard difficulty ";
+        }
+        if(difficulty == 4) {
+            prompt =prompt +" please make sure questions are related to subject but out of the box ";
+        }
+        return prompt;
+    }
+
+    public String buildQuestionsForTopic(String data, int difficulty){
         String prompt = "Can you build 10 multiple choice questions for the following topic -{ " + data + "} in Json format, the json should contain only these fields- questionId,questionText,answerChoices,correctAnswer\n";
+        prompt = enhancePrompt(difficulty, prompt);
         return callLLM(prompt);
     }
 

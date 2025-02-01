@@ -32,13 +32,13 @@ public class EasyQContoller {
     AWSDynamoService dynamoService;
 
     @GetMapping("/getQuestions")
-    public String getQuestions(@RequestParam("prompt") String prompt) {
+    public String getQuestions(@RequestParam("prompt") String prompt, int difficulty) {
         log.info("received "+prompt);
      String jsonQustions = null;
      if(prompt.startsWith("https://") || prompt.startsWith("http://")) {
 
          String webData = scraperService.scrape(prompt);
-          jsonQustions = llmService.buildQuestionsForLink(webData);
+          jsonQustions = llmService.buildQuestionsForLink(webData,difficulty);
          if (jsonQustions.contains("```json") && jsonQustions.contains("```")) {
              int startIndex = jsonQustions.indexOf("```json") + 7; // Move past ```json
              int endIndex = jsonQustions.indexOf("```", startIndex); // Find closing ```
@@ -51,7 +51,7 @@ public class EasyQContoller {
          dynamoService.saveOrUpdateLink(prompt,webData);
      } else {
          log.info("Prompt is not a link");
-         jsonQustions =  llmService.buildQuestionsForTopic(prompt);
+         jsonQustions =  llmService.buildQuestionsForTopic(prompt,difficulty);
          if (jsonQustions.contains("```json") && jsonQustions.contains("```")) {
              int startIndex = jsonQustions.indexOf("```json") + 7; // Move past ```json
              int endIndex = jsonQustions.indexOf("```", startIndex); // Find closing ```
