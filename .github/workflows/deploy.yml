@@ -1,0 +1,41 @@
+name: Automated Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '18'
+
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+
+    - name: Set up Apache Maven Central
+      uses: actions/setup-java@v3
+      with: # running setup-java again overwrites the settings.xml
+        distribution: 'temurin'
+        java-version: '18'
+        server-id: central # Value of the distributionManagement/repository/id field of the pom.xml
+        server-username: MAVEN_USERNAME # env variable for username in deploy
+        server-password:  MAVEN_CENTRAL_TOKEN # env variable for token in deploy
+        gpg-private-key: ${{ secrets.GPG }} # Value of the GPG private key to import
+        gpg-passphrase:  ${{ secrets.PASSPHRASE }} # env variable for GPG private key passphrase
+
+    - name: Publish to Apache Maven Central
+      run: mvn deploy
+      env:
+        MAVEN_USERNAME: ${{ secrets.MVN_USER }}
+        MAVEN_CENTRAL_TOKEN: ${{ secrets.MVN_PASS}}
+        MAVEN_GPG_PASSPHRASE: ${{ secrets.PASSPHRASE }}
