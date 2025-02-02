@@ -1,17 +1,17 @@
 package io.github.vishalmysore.security;
 
-import io.github.vishalmysore.service.AWSDynamoService;
+import io.github.vishalmysore.service.UserLoginDynamoService;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.UUID;
 
 @Log
 @Component
@@ -19,11 +19,11 @@ import java.util.UUID;
 public class RestCallFilter implements Filter {
 
     @Autowired
-    private final AWSDynamoService dynamoDbService;
+    private final UserLoginDynamoService userLoginDynamoService;
 
     @Autowired
-    public RestCallFilter(AWSDynamoService dynamoDbService) {
-        this.dynamoDbService = dynamoDbService;
+    public RestCallFilter(@Qualifier("userLoginDynamoService") UserLoginDynamoService userLoginDynamoService) {
+        this.userLoginDynamoService = userLoginDynamoService;
     }
 
 
@@ -46,7 +46,7 @@ public class RestCallFilter implements Filter {
         log.info("Received " + method + " request for " + uri + " from IP " + ipAddress);
 
         // Inject data into the usage table
-        dynamoDbService.insertUsageData(restCallId, ipAddress, timestamp);  // Insert into DynamoDB
+        userLoginDynamoService.insertUsageData(restCallId, ipAddress, timestamp);  // Insert into DynamoDB
 
         // Proceed with the request
         chain.doFilter(request, response);  // Continue to the next filter or the endpoint
@@ -62,7 +62,7 @@ public class RestCallFilter implements Filter {
         String timestamp = Instant.now().toString();
 
         // You can add additional components to make the ID even more unique (e.g., IP address)
-        return method + "-" + uri + "-" + timestamp + "-" + UUID.randomUUID().toString();
+        return method;
     }
 }
 

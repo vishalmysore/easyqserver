@@ -2,6 +2,7 @@ package io.github.vishalmysore.service;
 
 import io.github.vishalmysore.data.Link;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -20,23 +21,24 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-@Service
+@Service("awsDynamoService")
 @Log
 public class AWSDynamoService {
 
-    private static DynamoDbClient dynamoDbClient;
+    @Getter
+    protected  DynamoDbClient dynamoDbClient;
 
     @Autowired
-    private LLMService llmService;
+    protected LLMService llmService;
 
     // AWS Credentials
-    private static String accessKey;
-    private static String secretKey;
-    private static String TABLE_NAME ="links";
-    private static String USAGE_TABLE_NAME ="usage"; //should hold the rest calls and the ipaddress and time of the call
-
+    protected  String accessKey;
+    protected  String secretKey;
+    protected  String TABLE_NAME ="links";
+    protected  String USAGE_TABLE_NAME ="usage"; //should hold the rest calls and the ipaddress and time of the call
+    protected  String LOGINUSER_TABLE_NAME ="loginuser";
     // AWS Region (Set this to the region you're using)
-    private static final Region REGION = Region.US_EAST_1;
+    protected  final Region REGION = Region.US_EAST_1;
 
     // Initialize AWS credentials and DynamoDbClient
     @PostConstruct
@@ -62,8 +64,11 @@ public class AWSDynamoService {
             log.info("DynamoDbClient initialized for region: " + REGION.id());
             createLinksTable();
             createUsageTable();
+            createLoginUser();
         }
     }
+
+
     @Async
     public void insertUsageData(String restCallId, String ipAddress, String timestamp) {
         try {
@@ -158,7 +163,7 @@ public class AWSDynamoService {
             throw new RuntimeException("Error generating hash", e);
         }
     }
-    private  void waitForTableToBecomeActive(DynamoDbClient dynamoDbClient, String tableName) {
+    protected  void waitForTableToBecomeActive(DynamoDbClient dynamoDbClient, String tableName) {
         while (true) {
             try {
                 // Describe the table to get its current status
@@ -338,6 +343,86 @@ public class AWSDynamoService {
             log.info("Waiting for Table 'usage' to be created in region: " + REGION.id());
             waitForTableToBecomeActive(dynamoDbClient,USAGE_TABLE_NAME);
             log.info("Table 'usage' created successfully in region: " + REGION.id());
+            log.info("Table description: " + createTableResponse.tableDescription().tableName());
+
+        } catch (SdkException e) {
+            log.severe("Error occurred while creating table: " + e.getMessage());
+        }
+    }
+
+    private void createLoginUser() {
+        try {
+            if (dynamoDbClient == null) {
+                log.severe("DynamoDbClient is not initialized. Ensure that init() is called first.");
+                return;
+            }
+
+            // Check if the table 'links' already exists
+            ListTablesRequest listTablesRequest = ListTablesRequest.builder().build();
+            ListTablesResponse listTablesResponse = dynamoDbClient.listTables(listTablesRequest);
+            if (listTablesResponse.tableNames().contains(LOGINUSER_TABLE_NAME)) {
+                log.info("Table 'links' already exists. Skipping creation.");
+                return;
+            }
+
+            // Define the table schema if not found
+            CreateTableRequest createTableRequest = CreateTableRequest.builder()
+                    .tableName(LOGINUSER_TABLE_NAME)
+                    .keySchema(
+                            KeySchemaElement.builder()
+                                    .attributeName("userId")
+                                    .keyType(KeyType.HASH)  // Partition key
+                                    .build()
+                    )
+                    .attributeDefinitions(
+                            AttributeDefinition.builder()
+                                    .attributeName("userId")
+                                    .attributeType(ScalarAttributeType.S)  // String type for id
+                                    .build(),
+                            AttributeDefinition.builder()
+                                    .attributeName("emailId")
+                                    .attributeType(ScalarAttributeType.S)  // String type for timestamp
+                                    .build()
+                    )
+                    .provisionedThroughput(
+                            ProvisionedThroughput.builder()
+                                    .readCapacityUnits(5L)
+                                    .writeCapacityUnits(5L)
+                                    .build()
+                    )
+                    // Adding GSI for lastUsed
+                    .globalSecondaryIndexes(
+                            GlobalSecondaryIndex.builder()
+                                    .indexName("emailIdIndex")
+                                    .keySchema(
+                                            KeySchemaElement.builder()
+                                                    .attributeName("userId")
+                                                    .keyType(KeyType.HASH)  // Partition key of the GSI
+                                                    .build(),
+                                            KeySchemaElement.builder()
+                                                    .attributeName("emailId")
+                                                    .keyType(KeyType.RANGE)  // Sort key of the GSI
+                                                    .build()
+                                    )
+                                    .projection(Projection.builder()
+                                            .projectionType(ProjectionType.ALL)  // Include all attributes in the index
+                                            .build())
+                                    .provisionedThroughput(
+                                            ProvisionedThroughput.builder()
+                                                    .readCapacityUnits(5L)
+                                                    .writeCapacityUnits(5L)
+                                                    .build()
+                                    )
+                                    .build()
+                    )
+                    .build();
+
+// Create the table
+            CreateTableResponse createTableResponse = dynamoDbClient.createTable(createTableRequest);
+            System.out.println("Table created: " + createTableResponse.tableDescription().tableName());
+            log.info("Waiting for Table "+LOGINUSER_TABLE_NAME+" to be created in region: " + REGION.id());
+            waitForTableToBecomeActive(dynamoDbClient,LOGINUSER_TABLE_NAME);
+            log.info("Table "+LOGINUSER_TABLE_NAME+" created successfully in region: " + REGION.id());
             log.info("Table description: " + createTableResponse.tableDescription().tableName());
 
         } catch (SdkException e) {

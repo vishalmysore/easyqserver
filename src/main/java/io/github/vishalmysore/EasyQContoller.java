@@ -4,9 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.vishalmysore.data.Link;
 import io.github.vishalmysore.data.Question;
-import io.github.vishalmysore.service.AWSDynamoService;
-import io.github.vishalmysore.service.LLMService;
-import io.github.vishalmysore.service.ScraperService;
+import io.github.vishalmysore.service.*;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +27,13 @@ public class EasyQContoller {
     private ScraperService scraperService;
 
     @Autowired
-    AWSDynamoService dynamoService;
+    private AWSDynamoService awsDynamoService;
+
+    @Autowired
+    private UserLoginDynamoService userLoginDynamoService;
+
+    @Autowired
+    private QuizResultsDynamoService quizResultsDynamoService;
 
     @GetMapping("/getQuestions")
     public String getQuestions(@RequestParam("prompt") String prompt,@RequestParam("difficulty")  int difficulty) {
@@ -48,7 +52,7 @@ public class EasyQContoller {
 
              }
          }
-         dynamoService.saveOrUpdateLink(prompt,webData);
+         awsDynamoService.saveOrUpdateLink(prompt,webData);
      } else {
          log.info("Prompt is not a link");
          jsonQustions =  llmService.buildQuestionsForTopic(prompt,difficulty);
@@ -87,11 +91,11 @@ public class EasyQContoller {
 
     @GetMapping("/getTrendingLastHour")
     public List<Link> getTrendingLastHour() {
-        return dynamoService.getTrendingArticlesInLastHour();
+        return awsDynamoService.getTrendingArticlesInLastHour();
     }
 
     @GetMapping("/getTrendingAll")
     public List<Link> getTrendingAll() {
-        return dynamoService.getAllTimeTrendingArticles();
+        return awsDynamoService.getAllTimeTrendingArticles();
     }
 }
