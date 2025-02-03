@@ -108,16 +108,17 @@ public class AWSDynamoService {
             // Update the existing record
             updateLink(id);
         } else {
-            String author = llmService.callLLM(" who is the author of this article just provide the name and nothing else "+data);
+            String author = llmService.callLLM(" who is the author of this article just provide the name and nothing else, if you cannot find the name just return unknown "+data);
+            String keywords = llmService.callLLM(" what topic does this cover giving comma 5 separated topics for example java,programming  "+data);
             // Insert new record
-            createNewLink(id, url, author, data);
+            createNewLink(id, url, author, data,keywords);
         }
     }
 
     /**
      * Creates a new link entry in DynamoDB.
      */
-    private void createNewLink(String id, String url, String author, String data) {
+    private void createNewLink(String id, String url, String author, String data,String keywords) {
         Map<String, AttributeValue> item = new HashMap<>();
         item.put("id", AttributeValue.builder().s(id).build());
         item.put("url", AttributeValue.builder().s(url).build());
@@ -126,7 +127,7 @@ public class AWSDynamoService {
         item.put("totalAccessCount", AttributeValue.builder().n("1").build());
         item.put("author", AttributeValue.builder().s(author).build());
         item.put("data", AttributeValue.builder().s(data).build());
-
+        item.put("keywords", AttributeValue.builder().s(keywords).build());
         PutItemRequest putRequest = PutItemRequest.builder()
                 .tableName(TABLE_NAME)
                 .item(item)
@@ -154,7 +155,7 @@ public class AWSDynamoService {
         log.info("Updated link with id: " + id);
     }
 
-    private String generateSHA256Hash(String url) {
+    protected String generateSHA256Hash(String url) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(url.getBytes(StandardCharsets.UTF_8));
@@ -184,7 +185,7 @@ public class AWSDynamoService {
                 Thread.sleep(2000); // 2 seconds delay before retry
 
             } catch (DynamoDbException | InterruptedException e) {
-                System.err.println("Error describing table: " + e.getMessage());
+                log.info("Error describing table: " + e.getMessage());
                 break;
             }
         }
@@ -259,7 +260,7 @@ public class AWSDynamoService {
 
 // Create the table
             CreateTableResponse createTableResponse = dynamoDbClient.createTable(createTableRequest);
-            System.out.println("Table created: " + createTableResponse.tableDescription().tableName());
+            log.info("Table created: " + createTableResponse.tableDescription().tableName());
             log.info("Waiting for Table 'links' to be created in region: " + REGION.id());
             waitForTableToBecomeActive(dynamoDbClient,TABLE_NAME);
             log.info("Table 'links' created successfully in region: " + REGION.id());
@@ -339,7 +340,7 @@ public class AWSDynamoService {
 
 // Create the table
             CreateTableResponse createTableResponse = dynamoDbClient.createTable(createTableRequest);
-            System.out.println("Table created: " + createTableResponse.tableDescription().tableName());
+            log.info("Table created: " + createTableResponse.tableDescription().tableName());
             log.info("Waiting for Table 'usage' to be created in region: " + REGION.id());
             waitForTableToBecomeActive(dynamoDbClient,USAGE_TABLE_NAME);
             log.info("Table 'usage' created successfully in region: " + REGION.id());
@@ -419,7 +420,7 @@ public class AWSDynamoService {
 
 // Create the table
             CreateTableResponse createTableResponse = dynamoDbClient.createTable(createTableRequest);
-            System.out.println("Table created: " + createTableResponse.tableDescription().tableName());
+            log.info("Table created: " + createTableResponse.tableDescription().tableName());
             log.info("Waiting for Table "+LOGINUSER_TABLE_NAME+" to be created in region: " + REGION.id());
             waitForTableToBecomeActive(dynamoDbClient,LOGINUSER_TABLE_NAME);
             log.info("Table "+LOGINUSER_TABLE_NAME+" created successfully in region: " + REGION.id());

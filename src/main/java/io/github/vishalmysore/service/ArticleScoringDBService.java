@@ -12,10 +12,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Log
-@Service("quizResultsDynamoService")
-public class QuizResultsDynamoService extends AWSDynamoService {
+@Service("articleScoringDBService")
+public class ArticleScoringDBService extends AWSDynamoService{
+    protected static final String ARTICLESCORE_TABLE_NAME = "articlescores";
 
-    protected static final String QRESULT_TABLE_NAME = "quizresults";
 
     @PostConstruct
     public void init() {
@@ -33,28 +33,28 @@ public class QuizResultsDynamoService extends AWSDynamoService {
             // Check if the table 'links' already exists
             ListTablesRequest listTablesRequest = ListTablesRequest.builder().build();
             ListTablesResponse listTablesResponse = dynamoDbClient.listTables(listTablesRequest);
-            if (listTablesResponse.tableNames().contains(QRESULT_TABLE_NAME)) {
-                log.info("Table "+QRESULT_TABLE_NAME+"already exists. Skipping creation.");
+            if (listTablesResponse.tableNames().contains(ARTICLESCORE_TABLE_NAME)) {
+                log.info("Table "+ARTICLESCORE_TABLE_NAME+"already exists. Skipping creation.");
                 return;
             }
 
             // Define the table schema if not found
             CreateTableRequest createTableRequest = CreateTableRequest.builder()
-                    .tableName(QRESULT_TABLE_NAME)
+                    .tableName(ARTICLESCORE_TABLE_NAME)
                     .keySchema(
                             KeySchemaElement.builder()
-                                    .attributeName("userId")
+                                    .attributeName("linkId")
                                     .keyType(KeyType.HASH)  // Partition key
                                     .build()
                     )
                     .attributeDefinitions(
                             AttributeDefinition.builder()
-                                    .attributeName("userId")
+                                    .attributeName("linkId")
                                     .attributeType(ScalarAttributeType.S)  // String type for id
                                     .build(),
                             AttributeDefinition.builder()
-                                    .attributeName("emailId")
-                                    .attributeType(ScalarAttributeType.S)  // String type for timestamp
+                                    .attributeName("totalScore")
+                                    .attributeType(ScalarAttributeType.N)
                                     .build()
                     )
                     .provisionedThroughput(
@@ -66,14 +66,14 @@ public class QuizResultsDynamoService extends AWSDynamoService {
                     // Adding GSI for lastUsed
                     .globalSecondaryIndexes(
                             GlobalSecondaryIndex.builder()
-                                    .indexName("emailIdIndex")
+                                    .indexName("totalScoreIndex")
                                     .keySchema(
                                             KeySchemaElement.builder()
-                                                    .attributeName("userId")
+                                                    .attributeName("linkId")
                                                     .keyType(KeyType.HASH)  // Partition key of the GSI
                                                     .build(),
                                             KeySchemaElement.builder()
-                                                    .attributeName("emailId")
+                                                    .attributeName("totalScore")
                                                     .keyType(KeyType.RANGE)  // Sort key of the GSI
                                                     .build()
                                     )
@@ -93,16 +93,15 @@ public class QuizResultsDynamoService extends AWSDynamoService {
 // Create the table
             CreateTableResponse createTableResponse = dynamoDbClient.createTable(createTableRequest);
             log.info("Table created: " + createTableResponse.tableDescription().tableName());
-            log.info("Waiting for Table "+QRESULT_TABLE_NAME+" to be created in region: " + REGION.id());
-            waitForTableToBecomeActive(dynamoDbClient,QRESULT_TABLE_NAME);
-            log.info("Table "+QRESULT_TABLE_NAME+" created successfully in region: " + REGION.id());
+            log.info("Waiting for Table "+ARTICLESCORE_TABLE_NAME+" to be created in region: " + REGION.id());
+            waitForTableToBecomeActive(dynamoDbClient,ARTICLESCORE_TABLE_NAME);
+            log.info("Table "+ARTICLESCORE_TABLE_NAME+" created successfully in region: " + REGION.id());
             log.info("Table description: " + createTableResponse.tableDescription().tableName());
 
         } catch (SdkException e) {
             log.severe("Error occurred while creating table: " + e.getMessage());
         }
     }
-
     @Async
     public void insertScore(Score score) {
         try {
@@ -129,15 +128,16 @@ public class QuizResultsDynamoService extends AWSDynamoService {
 
             // Insert the new item into DynamoDB
             PutItemRequest putItemRequest = PutItemRequest.builder()
-                    .tableName(QRESULT_TABLE_NAME)
+                    .tableName(ARTICLESCORE_TABLE_NAME)
                     .item(item)
                     .build();
 
             dynamoDbClient.putItem(putItemRequest);
-            log.info("New score inserted successfully for userId: " + score.getUserId() + " and quizId: " + score.getQuizId()+" with linkId: "+id+" in table "+QRESULT_TABLE_NAME);
+            log.info("New score inserted successfully for userId: " + score.getUserId() + " and quizId: " + score.getQuizId()+" with score: "+score.getScore()+"in table: "+ARTICLESCORE_TABLE_NAME);
 
         } catch (SdkException e) {
             log.severe("Error occurred while inserting new score: " + e.getMessage());
         }
     }
+
 }

@@ -17,4 +17,6 @@ public class Question {
     private String questionText;
     private List<String> answerChoices;
     private String correctAnswer;
+    private String explanation;
+    private String userAnswer;
 }

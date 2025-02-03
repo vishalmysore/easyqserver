@@ -7,9 +7,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.List;
+
 @Log
 @Component
 @WebFilter("/*")
@@ -17,6 +21,7 @@ public class UserLoginFilter implements Filter {
 
 
     private final UserLoginDynamoService userLoginDynamoService;
+    private static final List<String> EXCLUDED_URLS = List.of("/api/createNewUser");
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -30,6 +35,11 @@ public class UserLoginFilter implements Filter {
             throws IOException, ServletException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+        String requestURI = httpRequest.getRequestURI();
+        if (EXCLUDED_URLS.stream().anyMatch(requestURI::contains)) {
+            chain.doFilter(request, response); // Proceed without applying filter
+            return;
+        }
         String authorizationHeader = httpRequest.getHeader("Authorization");
         String token = null;
 
@@ -73,6 +83,7 @@ public class UserLoginFilter implements Filter {
 
         } else {
             log.warning("No JWT token found in the request.");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token missing or expired.");
         }
         chain.doFilter(request, response);
     }
