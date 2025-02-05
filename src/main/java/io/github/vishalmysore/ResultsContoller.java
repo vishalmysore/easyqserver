@@ -22,11 +22,11 @@ public class ResultsContoller {
     private ArticleScoringDBService articleScoringDBService;
 
     @PostMapping("/updateResults")
-    public String updateResults(@RequestBody Score score, HttpServletRequest request) {
+    public Score updateResults(@RequestBody Score score, HttpServletRequest request) {
         log.info("Getting results "+score);
         quizResultsDynamoService.insertScore(score);
         articleScoringDBService.insertScore(score);
-        return "Results";
+        return score;
     }
 
 }

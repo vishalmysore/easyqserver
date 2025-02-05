@@ -36,6 +36,7 @@ public class UserLoginFilter implements Filter {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String requestURI = httpRequest.getRequestURI();
+        log.info("Request URI: " + requestURI);
         if (EXCLUDED_URLS.stream().anyMatch(requestURI::contains)) {
             chain.doFilter(request, response); // Proceed without applying filter
             return;
