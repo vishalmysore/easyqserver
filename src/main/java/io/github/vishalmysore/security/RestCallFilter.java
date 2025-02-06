@@ -5,7 +5,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.time.Instant;
 
-@Log
+@Slf4j
 @Component
 @WebFilter("/*") // Apply the filter to all paths
 public class RestCallFilter implements Filter {
@@ -46,7 +46,12 @@ public class RestCallFilter implements Filter {
         log.info("Received " + method + " request for " + uri + " from IP " + ipAddress);
 
         // Inject data into the usage table
-        userLoginDynamoService.insertUsageData(restCallId, ipAddress, timestamp);  // Insert into DynamoDB
+        userLoginDynamoService.insertUsageData(restCallId, ipAddress, timestamp)
+                .thenAccept(totalUsed -> log.info("Usage Table TotalUsed count: {}, {}",restCallId, totalUsed))
+                .exceptionally(ex -> {
+                    log.error("Failed to insert/update usage data: {}", ex.getMessage());
+                    return null;
+                });  // Insert into DynamoDB
 
         // Proceed with the request
         chain.doFilter(request, response);  // Continue to the next filter or the endpoint
@@ -59,10 +64,10 @@ public class RestCallFilter implements Filter {
         // Create a unique string by combining method, URI, and timestamp
         String method = httpRequest.getMethod();
         String uri = httpRequest.getRequestURI();
-        String timestamp = Instant.now().toString();
+       // String timestamp = Instant.now().toString();
 
         // You can add additional components to make the ID even more unique (e.g., IP address)
-        return method;
+        return method+uri;
     }
 }
 

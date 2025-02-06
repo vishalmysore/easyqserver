@@ -3,7 +3,7 @@ package io.github.vishalmysore.service;
 import io.github.vishalmysore.data.Link;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -20,9 +20,10 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @Service("awsDynamoService")
-@Log
+@Slf4j
 public class AWSDynamoService {
 
     @Getter
@@ -50,7 +51,7 @@ public class AWSDynamoService {
 
             // Ensure credentials are available
             if (accessKey == null || secretKey == null) {
-                log.severe("AWS credentials not found in environment variables.");
+                log.error("AWS credentials not found in environment variables.");
                 return;
             }
 
@@ -70,25 +71,55 @@ public class AWSDynamoService {
 
 
     @Async
-    public void insertUsageData(String restCallId, String ipAddress, String timestamp) {
+    public CompletableFuture<Integer> insertUsageData(String restCallId, String ipAddress, String timestamp) {
         try {
-            // Prepare the data for insertion
-            Map<String, AttributeValue> item = new HashMap<>();
-            item.put("restCallId", AttributeValue.builder().s(restCallId).build());
-            item.put("ipaddress", AttributeValue.builder().s(ipAddress).build());
-            item.put("timestamp", AttributeValue.builder().s(timestamp).build());
-
-            // Insert the item into the 'usage' table
-            PutItemRequest putItemRequest = PutItemRequest.builder()
+            // Check if the item exists
+            GetItemRequest getItemRequest = GetItemRequest.builder()
                     .tableName(USAGE_TABLE_NAME)
-                    .item(item)
+                    .key(Map.of("restCallId", AttributeValue.builder().s(restCallId).build()))
                     .build();
 
-            dynamoDbClient.putItem(putItemRequest);
+            GetItemResponse getItemResponse = dynamoDbClient.getItem(getItemRequest);
 
-            log.info("Successfully inserted data into 'usage' table.");
+            int totalUsed;
+            if (getItemResponse.hasItem()) {
+                // Item exists, update totalUsed
+                totalUsed = Integer.parseInt(getItemResponse.item().get("totalUsed").n()) + 1;
+
+                UpdateItemRequest updateItemRequest = UpdateItemRequest.builder()
+                        .tableName(USAGE_TABLE_NAME)
+                        .key(Map.of("restCallId", AttributeValue.builder().s(restCallId).build()))
+                        .updateExpression("SET totalUsed = :newTotal, ipaddress = :ip")
+                        .expressionAttributeValues(Map.of(
+                                ":newTotal", AttributeValue.builder().n(String.valueOf(totalUsed)).build(),
+                                ":ip", AttributeValue.builder().s(ipAddress).build()
+
+                        ))
+                        .build();
+
+                dynamoDbClient.updateItem(updateItemRequest);
+                log.info("Updated totalUsed count to {} for restCallId {}", totalUsed, restCallId);
+            } else {
+                // Item does not exist, insert new entry with totalUsed = 1
+                totalUsed = 1;
+                Map<String, AttributeValue> item = new HashMap<>();
+                item.put("restCallId", AttributeValue.builder().s(restCallId).build());
+                item.put("ipaddress", AttributeValue.builder().s(ipAddress).build());
+                item.put("totalUsed", AttributeValue.builder().n("1").build());
+                item.put("timestamp", AttributeValue.builder().s(timestamp).build());
+                PutItemRequest putItemRequest = PutItemRequest.builder()
+                        .tableName(USAGE_TABLE_NAME)
+                        .item(item)
+                        .build();
+
+                dynamoDbClient.putItem(putItemRequest);
+                log.info("Inserted new entry with totalUsed = 1 for restCallId {}", restCallId);
+            }
+
+            return CompletableFuture.completedFuture(totalUsed);
         } catch (DynamoDbException e) {
-            log.info("Failed to insert data into 'usage' table: " + e.getMessage());
+            log.error("Failed to insert/update data in 'usage' table: {}", e.getMessage());
+            return CompletableFuture.failedFuture(e);
         }
     }
     @Async
@@ -194,7 +225,7 @@ public class AWSDynamoService {
     private void createLinksTable() {
         try {
             if (dynamoDbClient == null) {
-                log.severe("DynamoDbClient is not initialized. Ensure that init() is called first.");
+                log.error("DynamoDbClient is not initialized. Ensure that init() is called first.");
                 return;
             }
 
@@ -267,14 +298,14 @@ public class AWSDynamoService {
             log.info("Table description: " + createTableResponse.tableDescription().tableName());
 
         } catch (SdkException e) {
-            log.severe("Error occurred while creating table: " + e.getMessage());
+            log.error("Error occurred while creating table: " + e.getMessage());
         }
     }
 
     private void createUsageTable() {
         try {
             if (dynamoDbClient == null) {
-                log.severe("DynamoDbClient is not initialized. Ensure that init() is called first.");
+                log.error("DynamoDbClient is not initialized. Ensure that init() is called first.");
                 return;
             }
 
@@ -347,14 +378,14 @@ public class AWSDynamoService {
             log.info("Table description: " + createTableResponse.tableDescription().tableName());
 
         } catch (SdkException e) {
-            log.severe("Error occurred while creating table: " + e.getMessage());
+            log.error("Error occurred while creating table: " + e.getMessage());
         }
     }
 
     private void createLoginUser() {
         try {
             if (dynamoDbClient == null) {
-                log.severe("DynamoDbClient is not initialized. Ensure that init() is called first.");
+                log.error("DynamoDbClient is not initialized. Ensure that init() is called first.");
                 return;
             }
 
@@ -427,7 +458,7 @@ public class AWSDynamoService {
             log.info("Table description: " + createTableResponse.tableDescription().tableName());
 
         } catch (SdkException e) {
-            log.severe("Error occurred while creating table: " + e.getMessage());
+            log.error("Error occurred while creating table: " + e.getMessage());
         }
     }
 
