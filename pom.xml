@@ -11,7 +11,7 @@
     </parent>
     <groupId>io.github.vishalmysore</groupId>
     <artifactId>easyQServer</artifactId>
-    <version>0.2.8.6</version>
+    <version>0.2.8.7</version>
     <name>Tools For Artificial Intelligence</name>
     <description>
         EasyQZ is an AI Powered quiz generation tool that allows users to generate quizzes from any article, link, topic, or custom text. Whether you're a student, educator, or professional, EasyQ helps you test your knowledge, compete with others, and discover trending topics.
@@ -44,6 +44,40 @@
 
     </properties>
     <dependencies>
+
+            <!-- Spring Boot Starter Web (Includes WebSocket) -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+            </dependency>
+
+            <!-- Spring Boot Starter for WebSocket -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-websocket</artifactId>
+            </dependency>
+
+            <!-- Optional: For handling STOMP (Messaging over WebSocket) -->
+        <!-- https://mvnrepository.com/artifact/org.springframework/spring-messaging -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-messaging</artifactId>
+
+        </dependency>
+        <dependency>
+            <groupId>org.java-websocket</groupId>
+            <artifactId>Java-WebSocket</artifactId>
+            <version>1.6.0</version>
+        </dependency>
+
+
+        <!-- Optional: If you need to use SockJS -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-websocket</artifactId>
+            </dependency>
+
+
         <!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>

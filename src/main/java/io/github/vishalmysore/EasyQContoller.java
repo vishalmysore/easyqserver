@@ -4,9 +4,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.vishalmysore.data.Link;
 import io.github.vishalmysore.data.Question;
+import io.github.vishalmysore.data.Quiz;
+import io.github.vishalmysore.data.QuizType;
 import io.github.vishalmysore.service.*;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,9 +40,12 @@ public class EasyQContoller {
     private QuizResultsDynamoService quizResultsDynamoService;
 
     @GetMapping("/getQuestions")
-    public String getQuestions(@RequestParam("prompt") String prompt,@RequestParam("difficulty")  int difficulty) {
+    public Quiz getQuestions(@RequestParam("prompt") String prompt, @RequestParam("difficulty")  int difficulty) {
         log.info("received "+prompt);
      String jsonQustions = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = (String) authentication.getPrincipal();  // Retrieve the userId set in the filter
+     String quizId= JsonUtils.generateUniqueIDForUser(userId);
      if(prompt.startsWith("https://") || prompt.startsWith("http://")) {
 
          String webData = scraperService.scrape(prompt);
@@ -53,7 +60,9 @@ public class EasyQContoller {
              }
          }
          awsDynamoService.saveOrUpdateLink(prompt,webData);
+         quizId = QuizType.LINK.toString()+"_"+quizId;
      } else {
+         quizId = QuizType.TOPIC.toString()+"_"+quizId;
          log.info("Prompt is not a link");
          jsonQustions =  llmService.buildQuestionsForTopic(prompt,difficulty);
          if (jsonQustions.contains("```json") && jsonQustions.contains("```")) {
@@ -86,7 +95,12 @@ public class EasyQContoller {
             }
 
         }
-     return jsonQustions;
+
+        Quiz quiz = new Quiz();
+        quiz.setQuizId(quizId);
+        quiz.setQuestions(questions);
+
+     return quiz;
     }
 
     @GetMapping("/getTrendingLastHour")

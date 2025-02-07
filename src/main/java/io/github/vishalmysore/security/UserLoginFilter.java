@@ -8,10 +8,13 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Log
@@ -39,6 +42,13 @@ public class UserLoginFilter implements Filter {
         log.info("Request URI: " + requestURI);
         if (EXCLUDED_URLS.stream().anyMatch(requestURI::contains)) {
             chain.doFilter(request, response); // Proceed without applying filter
+            return;
+        }
+        String upgradeHeader = httpRequest.getHeader("Upgrade");
+        if (upgradeHeader != null && upgradeHeader.equalsIgnoreCase("websocket")) {
+            // This is a WebSocket request, bypass this filter
+            log.info("Skipping filter for WebSocket connection");
+            chain.doFilter(request, response); // Continue with the WebSocket request
             return;
         }
         String authorizationHeader = httpRequest.getHeader("Authorization");
@@ -78,7 +88,7 @@ public class UserLoginFilter implements Filter {
 
                 String userId = jwtUtil.getUserId(token);  // Assuming the user ID is stored in the "sub" field
                 log.info("User ID from JWT: " + userId);
-
+                SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userId, null, new ArrayList<>()));
                 // Call the service to update the login data (user login, etc.)
                 userLoginDynamoService.trackUserLogin(userId,"temp", clientIp);
 

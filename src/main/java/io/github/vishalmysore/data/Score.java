@@ -25,4 +25,24 @@ public class Score {
     private String url;
     private String topics;
     private List<Question> questions;
+
+    private QuizType quizType;
+
+    public void setQuizId(String quizId) {
+        this.quizId = quizId;
+
+        // Set quizType based on the quizId prefix
+        if (quizId != null) {
+            // Iterate through all QuizType values
+            for (QuizType type : QuizType.values()) {
+                if (quizId.toLowerCase().startsWith(type.toString().toLowerCase())) {
+                    this.quizType = type;
+                    return;  // Exit the loop once a match is found
+                }
+            }
+
+            // If no match is found, default to TOPIC (or another default type)
+            this.quizType = QuizType.TOPIC;
+        }
+    }
 }

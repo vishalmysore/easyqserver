@@ -2,6 +2,7 @@ package io.github.vishalmysore;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.vishalmysore.data.QuizType;
 import io.github.vishalmysore.data.Story;
 import io.github.vishalmysore.service.LLMService;
 import io.github.vishalmysore.service.StoryStorageService;
@@ -40,7 +41,7 @@ public class StoryTellerController {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        String storyId = System.currentTimeMillis() + userId;
+        String storyId = QuizType.STORY.toString()+"_" +JsonUtils.generateUniqueIDForUser(userId);
         story.setStoryType(storyType);
         story.setUserId(userId);
         story.setStoryId(storyId);
