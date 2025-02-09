@@ -1,5 +1,6 @@
 package io.github.vishalmysore.security;
 
+import io.github.vishalmysore.service.GoogleAuthService;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,13 @@ public class FilterConfig {
         FilterRegistrationBean<HostFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new HostFilter(hostValidator));
         registrationBean.addUrlPatterns("/api/*"); // Apply filter only to API endpoints
+        return registrationBean;
+    }
+    @Bean
+    public FilterRegistrationBean<GoogleAuthFilter> googleAuthFilter(GoogleAuthService googleAuthService) {
+        FilterRegistrationBean<GoogleAuthFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(new GoogleAuthFilter(googleAuthService)); // Register GoogleAuthFilter
+        registrationBean.addUrlPatterns("/auth/google"); // Apply filter only to /auth/google
         return registrationBean;
     }
 }

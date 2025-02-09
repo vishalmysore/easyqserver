@@ -4,7 +4,7 @@ import io.github.vishalmysore.service.UserLoginDynamoService;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -17,14 +17,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Log
+@Slf4j
 @Component
 @WebFilter("/*")
 public class UserLoginFilter implements Filter {
 
 
     private final UserLoginDynamoService userLoginDynamoService;
-    private static final List<String> EXCLUDED_URLS = List.of("/api/createNewUser");
+    private static final List<String> EXCLUDED_URLS = List.of("/api/createNewTempUser","/auth/google","/favicon.ico");
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -86,16 +86,31 @@ public class UserLoginFilter implements Filter {
         // Decode JWT token and extract user details if token is valid
         if (token != null) {
 
-                String userId = jwtUtil.getUserId(token);  // Assuming the user ID is stored in the "sub" field
+            if(jwtUtil.isTokenExpired(token)){
+                  String tempuserId = jwtUtil.getTempUserId(token);
+                    log.warn("Token expired for user {}",tempuserId);
+                    if(jwtUtil.isTempUser(token) && requestURI.equals("/api/markUserForRemoval")){
+                        log.info("Temp user token expired {} and calling {} ",tempuserId,requestURI);
+                        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(tempuserId, null, new ArrayList<>()));
+                        chain.doFilter(request, response);
+                        return;
+                    } else {
+                        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token expired.");
+                    }
+                }
+                String userId = jwtUtil.getUserId(token);
+                // Assuming the user ID is stored in the "sub" field
                 log.info("User ID from JWT: " + userId);
                 SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userId, null, new ArrayList<>()));
                 // Call the service to update the login data (user login, etc.)
                 userLoginDynamoService.trackUserLogin(userId,"temp", clientIp);
 
         } else {
-            log.warning("No JWT token found in the request.");
+            log.warn("No JWT token found in the request.");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token missing or expired.");
         }
         chain.doFilter(request, response);
     }
+
+
 }

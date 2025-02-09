@@ -2,15 +2,14 @@ package io.github.vishalmysore.security;
 
 import io.github.vishalmysore.service.AWSDynamoService;
 import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 
 @Log
-@WebFilter("/*")
 public class HostFilter implements Filter {
 
     private final HostValidator hostValidator;
@@ -60,12 +59,16 @@ public class HostFilter implements Filter {
 
         // Check if the Host and IP are allowed
        if (origin != null && hostValidator.isAllowedHost(origin) ) {
+            log.info("Host is allowed "+origin);
             // Allow the request to continue if both host and IP are valid
             chain.doFilter(request, response);
         } else {
-            // Reject the request if either host or IP is not allowed
-            response.getWriter().write("Access Denied: Invalid Host or IP.");
+           ((HttpServletResponse)response).setStatus(HttpServletResponse.SC_FORBIDDEN);
+           // Reject the request if either host or IP is not allowed
+            response.getWriter().write("Access Denied: Invalid Host or IP Bad Request.");
             response.getWriter().flush();
+           response.getWriter().close();
+
         }
 
 
