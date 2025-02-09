@@ -115,11 +115,12 @@ public class QuizResultsDynamoService extends AWSDynamoService {
                 log.error("DynamoDbClient is not initialized. Ensure that init() is called first.");
                 return;
             }
-            String id = generateSHA256Hash(score.getUrl());
+
             // Create the item for the new score
             Map<String, AttributeValue> item = new HashMap<>();
-
+            String id = "Story_Topic";
             if(score.getQuizType().equals(QuizType.LINK)) {
+                id = generateSHA256Hash(score.getUrl());
                 GetItemRequest getItemRequest = GetItemRequest.builder()
                         .tableName(TABLE_NAME)  // Your links table name
                         .key(Map.of(
@@ -144,6 +145,7 @@ public class QuizResultsDynamoService extends AWSDynamoService {
                 }
                 item.put("latest_linkId", AttributeValue.builder().s(id).build());
                 item.put("latest_url", AttributeValue.builder().s(score.getUrl()).build());
+
             } else if(score.getQuizType().equals(QuizType.TOPIC)) {
                 item.put("latest_topics", AttributeValue.builder().s(score.getTopics()).build());
                 item.put("latest_linkId", AttributeValue.builder().s("NA").build());
@@ -152,7 +154,7 @@ public class QuizResultsDynamoService extends AWSDynamoService {
             } else if(score.getQuizType().equals(QuizType.STORY)) {
                 item.put("latest_topics", AttributeValue.builder().s("story").build());
                 item.put("latest_linkId", AttributeValue.builder().s("NA").build());
-                item.put("latest_url", AttributeValue.builder().s(score.getUrl()).build());
+
             }
             item.put("latest_score_type", AttributeValue.builder().s(score.getQuizType().toString()).build());
             item.put("timestamp", AttributeValue.builder().n(String.valueOf(System.currentTimeMillis())).build());  // Add timestamp
@@ -206,7 +208,51 @@ public class QuizResultsDynamoService extends AWSDynamoService {
             log.info("New score inserted successfully for userId: " + score.getUserId() + " and quizId: " + score.getQuizId()+" with linkId: "+id+" in table "+ USER_LATEST_SCORE);
 
         } catch (SdkException e) {
+            e.printStackTrace();
             log.error("Error occurred while inserting new score: " + e.getMessage());
+        }
+    }
+
+    public Double getOverallScore(String userId) {
+        try {
+            // Prepare the key to fetch the latest record for the user
+            HashMap<String, AttributeValue> key = new HashMap<>();
+            key.put("userId", AttributeValue.builder().s(userId).build());  // The partition key
+            key.put("timestamp", AttributeValue.builder().n("0").build()); // Start with a low timestamp for the query
+
+            // Query the table to get the latest record (reverse order)
+            QueryRequest queryRequest = QueryRequest.builder()
+                    .tableName(USER_LATEST_SCORE)  // Table name
+                    .keyConditionExpression("userId = :userId")
+                    .expressionAttributeValues(
+                            Map.of(":userId", AttributeValue.builder().s(userId).build())
+                    )
+                    .scanIndexForward(false)  // This ensures the most recent entry comes first
+                    .limit(1)  // Only fetch the latest record
+                    .build();
+
+            // Execute the query
+            QueryResponse queryResponse = dynamoDbClient.query(queryRequest);
+
+            if (queryResponse.items().isEmpty()) {
+                log.warn("No records found for user: " + userId);
+                return 0.0;  // No records found, return 0
+            }
+
+            // Get the latest record
+            Map<String, AttributeValue> latestRecord = queryResponse.items().get(0);
+
+            // Retrieve the "overallScore" from the record (ensure it's a number or can be parsed to Double)
+            String overallScoreStr = latestRecord.get("overallScore").n();  // DynamoDB stores numbers as strings
+            Double overallScore = Double.parseDouble(overallScoreStr);  // Parse string to Double
+
+            // Return the final score
+            log.info("Latest overall score for user " + userId + ": " + overallScore);
+            return overallScore;
+
+        } catch (SdkException e) {
+            log.error("Error retrieving latest overall score for user " + userId + ": " + e.getMessage());
+            return 0.0;  // Return default 0.0 in case of error
         }
     }
 }
