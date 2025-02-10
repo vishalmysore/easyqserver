@@ -12,7 +12,9 @@ public class FilterConfig {
     public FilterRegistrationBean<HostFilter> loggingFilter(HostValidator hostValidator) {
         FilterRegistrationBean<HostFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new HostFilter(hostValidator));
-        registrationBean.addUrlPatterns("/api/*"); // Apply filter only to API endpoints
+        registrationBean.addUrlPatterns("/api/*");
+        registrationBean.addUrlPatterns("/ws/*");
+        registrationBean.addUrlPatterns("/wss/*");// Apply filter only to API endpoints
         return registrationBean;
     }
     @Bean

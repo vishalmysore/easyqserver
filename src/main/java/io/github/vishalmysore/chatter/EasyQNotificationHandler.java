@@ -2,11 +2,10 @@ package io.github.vishalmysore.chatter;
 
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
 import java.io.IOException;
 
-public class EasyQNotificationHandler extends AbstractWebSocketHandler {
+public class EasyQNotificationHandler extends AbstractEasyQWSHandler {
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) {
         try {

@@ -16,14 +16,14 @@ public class EasyQChatConfig implements WebSocketConfigurer {
     @Autowired
     private WebSocketHandshakeInterceptor handshakeInterceptor;
     @Autowired
-    private  EasyQChatHandler easyQChatHandler;
+    private EasyQScoreHandler easyQScoreHandler;
 
 
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         // Register the first handler for the "/ws/chat" endpoint
-        registry.addHandler(easyQChatHandler, "/ws/chat")
+        registry.addHandler(easyQScoreHandler, "/ws/score")
                 .addInterceptors(handshakeInterceptor)
                 .setAllowedOrigins(allowedHosts);
 

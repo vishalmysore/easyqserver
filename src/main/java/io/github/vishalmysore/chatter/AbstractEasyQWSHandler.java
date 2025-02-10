@@ -1,30 +1,18 @@
 package io.github.vishalmysore.chatter;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
+import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
-@Component
-public class EasyQChatHandler extends TextWebSocketHandler {
-    private final Map<String, WebSocketSession> userSessions = new ConcurrentHashMap<>();
-    @Override
-    public void handleTextMessage(WebSocketSession session, TextMessage message) {
-        try {
-            String userId = (String) session.getAttributes().get("userId");
-            session.sendMessage(new TextMessage("Hello, "+userId));
-        } catch (IOException e) {
-            log.error(String.valueOf(e));
-        }
-    }
-
+public abstract class AbstractEasyQWSHandler extends AbstractWebSocketHandler {
+    @Getter
+    protected final Map<String, WebSocketSession> userSessions = new ConcurrentHashMap<>();
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         // Retrieve the token and userId from the session attributes
@@ -45,20 +33,7 @@ public class EasyQChatHandler extends TextWebSocketHandler {
         return userSessions.get(userId);
     }
 
-    // Method to send a message to a specific user
-    public void sendMessageToUser(String userId, String message) {
-        WebSocketSession session = userSessions.get(userId);
-        if (session != null && session.isOpen()) {
-            try {
-                session.sendMessage(new TextMessage(message));
-                log.info("Sent message to user: " + userId);
-            } catch (IOException e) {
-                log.error("Error sending message to user " + userId + ": " + e.getMessage());
-            }
-        } else {
-            log.warn("No open session found for user: " + userId);
-        }
-    }
+
 
     // Method to remove the session once the connection is closed
     @Override

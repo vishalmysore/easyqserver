@@ -1,6 +1,6 @@
 package io.github.vishalmysore;
 
-import io.github.vishalmysore.chatter.EasyQChatHandler;
+import io.github.vishalmysore.chatter.EasyQScoreHandler;
 import io.github.vishalmysore.data.QuizType;
 import io.github.vishalmysore.data.Score;
 import io.github.vishalmysore.service.ArticleScoringDBService;
@@ -23,15 +23,15 @@ public class ResultsContoller {
     private ArticleScoringDBService articleScoringDBService;
 
 
-    private  EasyQChatHandler easyQChatHandler;
+    private EasyQScoreHandler easyQScoreHandler;
 
     @Autowired
     public ResultsContoller(QuizResultsDynamoService quizResultsDynamoService,
                      ArticleScoringDBService articleScoringDBService,
-                     EasyQChatHandler easyQChatHandler) {
+                     EasyQScoreHandler easyQScoreHandler) {
         this.quizResultsDynamoService = quizResultsDynamoService;
         this.articleScoringDBService = articleScoringDBService;
-        this.easyQChatHandler = easyQChatHandler;
+        this.easyQScoreHandler = easyQScoreHandler;
     }
 
 
@@ -42,11 +42,11 @@ public class ResultsContoller {
         String userId = (String) authentication.getPrincipal();  // Retrieve the userId set in the filter
         score.setUserId(userId);
         log.info("Getting results "+score);
-        quizResultsDynamoService.insertScore(score);
+        quizResultsDynamoService.insertScore(score,easyQScoreHandler);
         if(score.getQuizType().equals(QuizType.LINK)) {
             articleScoringDBService.insertScore(score);
         }
-        easyQChatHandler.sendMessageToUser(userId,"Your score for the quiz is "+score.getScore());
+
         return score;
     }
 

@@ -44,7 +44,7 @@ public class EQWebSocketClient extends WebSocketClient {
     }
 
     public static void main(String[] args) throws URISyntaxException {
-        WebSocketClient client = new EQWebSocketClient(new URI("ws://localhost:7860/ws/chat"));
+        WebSocketClient client = new EQWebSocketClient(new URI("wss://vishalmysore-easyqserver.hf.space/ws/chat"));
 
         client.connect();
     }

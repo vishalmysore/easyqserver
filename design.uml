@@ -1,0 +1,36 @@
+@startuml
+!define AWS_DYNAMODB https://upload.wikimedia.org/wikipedia/commons/5/5c/Amazon-DynamoDB-Logo.svg
+
+title EasyQz Research Agent - Architecture
+
+actor User
+
+rectangle "Frontend (Angular)" {
+    User -- (Web UI)
+    (Web UI) --> (Quiz Submission)
+    (Web UI) --> (Article Upload)
+    (Web UI) --> (Quiz Generation)
+    (Web UI) --> (User Analytics)
+}
+
+rectangle "Backend (Spring Boot)" {
+    (Quiz Submission) --> (Spring Boot API)
+    (Article Upload) --> (Spring Boot API)
+    (Quiz Generation) --> (Spring Boot API)
+    (User Analytics) --> (Spring Boot API)
+
+    (Spring Boot API) --> (NLP Processor)
+    (Spring Boot API) --> (Quiz Engine)
+    (Spring Boot API) --> (User Management)
+}
+
+cloud "AWS DynamoDB" {
+    database "Quiz Data Store" as DynamoDB [[AWS_DYNAMODB]]
+    (Spring Boot API) --> DynamoDB : "Store/Retrieve Quiz Data"
+}
+
+cloud "OpenAI API" {
+    (NLP Processor) --> (OpenAI API) : "Generate Quiz Questions"
+}
+
+@enduml

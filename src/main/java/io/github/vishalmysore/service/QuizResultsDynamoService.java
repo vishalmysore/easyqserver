@@ -1,5 +1,6 @@
 package io.github.vishalmysore.service;
 
+import io.github.vishalmysore.chatter.EasyQScoreHandler;
 import io.github.vishalmysore.data.QuizType;
 import io.github.vishalmysore.data.Score;
 import jakarta.annotation.PostConstruct;
@@ -109,7 +110,7 @@ public class QuizResultsDynamoService extends AWSDynamoService {
     }
 
     @Async
-    public void insertScore(Score score) {
+    public void insertScore(Score score, EasyQScoreHandler easyQScoreHandler) {
         try {
             if (dynamoDbClient == null) {
                 log.error("DynamoDbClient is not initialized. Ensure that init() is called first.");
@@ -207,6 +208,7 @@ public class QuizResultsDynamoService extends AWSDynamoService {
             dynamoDbClient.putItem(putItemRequest);
             log.info("New score inserted successfully for userId: " + score.getUserId() + " and quizId: " + score.getQuizId()+" with linkId: "+id+" in table "+ USER_LATEST_SCORE);
 
+            easyQScoreHandler.sendScoreToUser(score.getUserId(), (double)overallScore);
         } catch (SdkException e) {
             e.printStackTrace();
             log.error("Error occurred while inserting new score: " + e.getMessage());
