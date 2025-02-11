@@ -19,12 +19,12 @@ import java.util.List;
 
 @Slf4j
 @Component
-@WebFilter("/*")
+@WebFilter("/*") // Apply the filter to all paths
 public class UserLoginFilter implements Filter {
 
 
     private final UserLoginDynamoService userLoginDynamoService;
-    private static final List<String> EXCLUDED_URLS = List.of("/api/createNewTempUser","/auth/google","/favicon.ico");
+    private static final List<String> EXCLUDED_URLS = List.of("/api/createNewTempUser","/auth/google","/favicon.ico","/bs/");
 
     @Autowired
     private JwtUtil jwtUtil;

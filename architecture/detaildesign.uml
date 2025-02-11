@@ -1,0 +1,63 @@
+@startuml
+skinparam linetype ortho
+skinparam backgroundColor #F7F7F7
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+title 🎯 **EasyQz - AI Research Agent**
+
+actor User #5B9BD5
+actor "Admin" #C0504D
+
+package "Frontend (Angular)" #A2C4C9 {
+    [User Interface] #D9EAD3
+    [Quiz Selection Module] #D9EAD3
+    [Real-time Quiz Updates] #D9EAD3
+    [Analytics Dashboard] #D9EAD3
+}
+
+package "Backend (Spring Boot)" #FFD966 {
+    [REST API] #F4B183
+    [WebSocket Server] #F4B183
+    [Authentication Service] #F4B183
+    [Quiz Engine] #F4B183
+}
+
+package "Quiz Data (AWS DynamoDB)" #C9DAF8 {
+    [User Scores] #A4C2F4
+    [Quiz Records] #A4C2F4
+    [Article Engagement Metrics] #A4C2F4
+}
+
+package "AI Platform (OpenAI)" #E06666 {
+    [Quiz Generator] #F6B26B
+    [Content Summarizer] #F6B26B
+}
+
+package "Content Sources" #B6D7A8 {
+    [News APIs] #76A5AF
+    [Sports APIs] #76A5AF
+    [User-Provided Links] #76A5AF
+    [Custom Topics] #76A5AF
+}
+
+User --> [User Interface] : "Accesses Platform"
+Admin --> [Analytics Dashboard] : "Views Reports"
+
+[User Interface] --> [Quiz Selection Module] : "Selects Quiz Type"
+[Quiz Selection Module] --> [REST API] : "Requests Quiz"
+[REST API] --> [Quiz Engine] : "Fetch Quiz Data"
+
+[Quiz Engine] --> [News APIs] : "Fetches News-Based Quiz"
+[Quiz Engine] --> [Sports APIs] : "Fetches Sports-Based Quiz"
+[Quiz Engine] --> [OpenAI API] : "Generates AI Quiz"
+
+[REST API] --> [WebSocket Server] : "Updates Users in Real-time"
+[WebSocket Server] --> [User Interface] : "Delivers Live Updates"
+
+[REST API] --> [DynamoDB] : "Stores User Scores & Engagement"
+
+[Analytics Dashboard] --> [DynamoDB] : "Fetches Insights"
+[DynamoDB] --> [Admin] : "Provides Analytics"
+
+@enduml

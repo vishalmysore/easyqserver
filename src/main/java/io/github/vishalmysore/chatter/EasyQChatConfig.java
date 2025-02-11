@@ -18,7 +18,14 @@ public class EasyQChatConfig implements WebSocketConfigurer {
     @Autowired
     private EasyQScoreHandler easyQScoreHandler;
 
+   @Autowired
+   private EasyQNotificationHandler easyQNotificationHandler;
 
+   @Autowired
+   private EasyQAdminHandler easyQAdminHandler;
+
+   @Autowired
+   private EasyQChallengeHandler easyQChallengeHandler;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
@@ -28,12 +35,16 @@ public class EasyQChatConfig implements WebSocketConfigurer {
                 .setAllowedOrigins(allowedHosts);
 
         // Register the second handler for the "/ws/notifications" endpoint
-        registry.addHandler(new EasyQNotificationHandler(), "/ws/notifications")
+        registry.addHandler(easyQNotificationHandler, "/ws/notifications")
                 .addInterceptors(handshakeInterceptor)
                 .setAllowedOrigins(allowedHosts);
 
         // Register another handler for a different WebSocket endpoint
-        registry.addHandler(new EasyQAdminHandler(), "/ws/admin")
+        registry.addHandler(easyQAdminHandler,"/ws/admin")
+                .addInterceptors(handshakeInterceptor)
+                .setAllowedOrigins(allowedHosts);
+
+        registry.addHandler(easyQChallengeHandler,"/ws/challenges")
                 .addInterceptors(handshakeInterceptor)
                 .setAllowedOrigins(allowedHosts);
     }

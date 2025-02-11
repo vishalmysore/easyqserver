@@ -1,0 +1,44 @@
+%%{init: {'themeVariables': { 'primaryColor': '#42A5F5', 'edgeLabelBackground':'#FF7043', 'tertiaryColor': '#4CAF50', 'secondaryColor': '#FFC107', 'lineWidth': 2 }} }%%
+graph TD
+    subgraph Client Side
+        A[Admin Interface]
+        B[Student Interface]
+    end
+
+    subgraph "Server Side"
+        C[Spring Boot Backend]
+        D[AWS DynamoDB]
+        E[OpenAI Platform]
+        F[Document Management]
+        G[Quiz Generator]
+        H[Learning Tracker]
+        I[Feedback System]
+    end
+
+    A -->|Manage Documents & Quizzes| C
+    B -->|View Documents & Take Quizzes| C
+    C -->|Fetch & Store Data| D
+    C -->|Generate Quizzes| G
+    C -->|Provide Feedback| I
+    G -->|Quiz Data| D
+    G -->|Generate Quiz from Document| F
+    F -->|Store Documents| D
+    F -->|Fetch Documents| C
+    I -->|Track Student Progress| H
+    H -->|Store Progress Data| D
+    E -->|Generate Insights| I
+    D -->|Store Data| A
+    D -->|Store Data| B
+
+    style A fill:#FF7043,stroke:#333,stroke-width:2px
+    style B fill:#42A5F5,stroke:#333,stroke-width:2px
+    style C fill:#FFCC00,stroke:#333,stroke-width:2px
+    style D fill:#4CAF50,stroke:#333,stroke-width:2px
+    style E fill:#FFC107,stroke:#333,stroke-width:2px
+    style F fill:#FFCC00,stroke:#333,stroke-width:2px
+    style G fill:#FF7043,stroke:#333,stroke-width:2px
+    style H fill:#FFC107,stroke:#333,stroke-width:2px
+    style I fill:#42A5F5,stroke:#333,stroke-width:2px
+
+    classDef backend fill:#4CAF50,stroke:#333,stroke-width:2px;
+    class C,D,E,F,G,H,I backend;

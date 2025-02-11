@@ -7,7 +7,7 @@ import org.springframework.web.socket.WebSocketSession;
 import java.io.IOException;
 
 @Component
-public class EasyQAdminHandler extends AbstractEasyQWSHandler {
+public class EasyQChallengeHandler extends AbstractEasyQWSHandler {
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) {
         try {

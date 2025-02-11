@@ -1,5 +1,6 @@
 package io.github.vishalmysore.service;
 
+import io.github.vishalmysore.chatter.EasyQNotificationHandler;
 import io.github.vishalmysore.data.Score;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.java.Log;
@@ -103,7 +104,7 @@ public class ArticleScoringDBService extends AWSDynamoService{
         }
     }
     @Async
-    public void insertScore(Score score) {
+    public void insertScore(Score score, EasyQNotificationHandler easyQNotificationHandler) {
         try {
             if (dynamoDbClient == null) {
                 log.severe("DynamoDbClient is not initialized. Ensure that init() is called first.");
@@ -134,6 +135,7 @@ public class ArticleScoringDBService extends AWSDynamoService{
 
             dynamoDbClient.putItem(putItemRequest);
             log.info("New score inserted successfully for userId: " + score.getUserId() + " and quizId: " + score.getQuizId()+" with score: "+score.getScore()+"in table: "+ARTICLESCORE_TABLE_NAME);
+
 
         } catch (SdkException e) {
             log.severe("Error occurred while inserting new score: " + e.getMessage());

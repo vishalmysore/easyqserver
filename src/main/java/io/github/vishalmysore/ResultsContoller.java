@@ -1,5 +1,6 @@
 package io.github.vishalmysore;
 
+import io.github.vishalmysore.chatter.EasyQNotificationHandler;
 import io.github.vishalmysore.chatter.EasyQScoreHandler;
 import io.github.vishalmysore.data.QuizType;
 import io.github.vishalmysore.data.Score;
@@ -25,13 +26,19 @@ public class ResultsContoller {
 
     private EasyQScoreHandler easyQScoreHandler;
 
+    private EasyQNotificationHandler easyQNotificationHandler;
+
+    private NotificationController notificationController;
+
     @Autowired
     public ResultsContoller(QuizResultsDynamoService quizResultsDynamoService,
                      ArticleScoringDBService articleScoringDBService,
-                     EasyQScoreHandler easyQScoreHandler) {
+                     EasyQScoreHandler easyQScoreHandler, EasyQNotificationHandler easyQNotificationHandler, NotificationController notificationController) {
         this.quizResultsDynamoService = quizResultsDynamoService;
         this.articleScoringDBService = articleScoringDBService;
         this.easyQScoreHandler = easyQScoreHandler;
+        this.easyQNotificationHandler = easyQNotificationHandler;
+        this.notificationController = notificationController;
     }
 
 
@@ -44,7 +51,8 @@ public class ResultsContoller {
         log.info("Getting results "+score);
         quizResultsDynamoService.insertScore(score,easyQScoreHandler);
         if(score.getQuizType().equals(QuizType.LINK)) {
-            articleScoringDBService.insertScore(score);
+            articleScoringDBService.insertScore(score,easyQNotificationHandler);
+            notificationController.sendNotification("newTestTaken", score);
         }
 
         return score;

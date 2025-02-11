@@ -1,0 +1,50 @@
+@startuml
+!define FRONTEND_COLOR #42A5F5
+!define BACKEND_COLOR #FF7043
+!define DATABASE_COLOR #4CAF50
+!define AI_PLATFORM_COLOR #FFC107
+
+actor User
+node "Angular Frontend" as Frontend {
+  [User Interface] <<component>>
+}
+
+node "Spring Boot Backend" as Backend {
+  [REST API] <<component>>
+  [WebSocket Server] <<component>>
+}
+
+node "AWS DynamoDB" as DynamoDB {
+  [DynamoDB Database] <<component>>
+}
+
+node "OpenAI Platform" as OpenAI {
+  [AI Service] <<component>>
+}
+
+User --> Frontend : Access UI
+Frontend --> Backend : REST API Calls
+Frontend --> Backend : WebSocket Connection
+Backend --> DynamoDB : Query Data
+Backend --> OpenAI : Request AI Insights
+
+note right of Frontend
+  #FRONTEND_COLOR: Angular Frontend (UI)
+end note
+
+note right of Backend
+  #BACKEND_COLOR: Spring Boot Backend (REST & WebSocket)
+end note
+
+note right of DynamoDB
+  #DATABASE_COLOR: AWS DynamoDB (Database)
+end note
+
+note right of OpenAI
+  #AI_PLATFORM_COLOR: OpenAI (AI Platform)
+end note
+
+' Make it vertical and aligned
+left to right direction
+
+@enduml

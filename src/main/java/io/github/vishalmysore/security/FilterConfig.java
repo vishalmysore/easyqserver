@@ -13,6 +13,7 @@ public class FilterConfig {
         FilterRegistrationBean<HostFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new HostFilter(hostValidator));
         registrationBean.addUrlPatterns("/api/*");
+        registrationBean.addUrlPatterns("/bs/*");
         registrationBean.addUrlPatterns("/ws/*");
         registrationBean.addUrlPatterns("/wss/*");// Apply filter only to API endpoints
         return registrationBean;

@@ -1,0 +1,45 @@
+@startuml
+!define RECTANGLE #FFDB58
+!define ALTERNATIVE #FF6347
+!define SUCCESS_COLOR #4CAF50
+!define ERROR_COLOR #F44336
+!define RETRY_COLOR #2196F3
+
+actor User
+participant "Frontend" as Frontend
+participant "Backend" as Backend
+participant "Quiz Service" as QuizService
+participant "AI Platform (OpenAI)" as OpenAI
+
+User -> Frontend : Request to generate quiz
+Frontend -> Backend : API Call to request quiz data
+
+alt Quiz generation success
+    Backend -> QuizService : Request to generate quiz
+    QuizService -> OpenAI : Request AI to generate quiz
+    OpenAI -> QuizService : Return quiz content
+    QuizService -> Backend : Return generated quiz
+    Backend -> Frontend : Send quiz data
+    Frontend -> User : Display quiz
+
+else Quiz generation failed
+
+    Backend -> QuizService : Retry to generate quiz
+    loop Retry attempts (3 times max)
+        QuizService -> OpenAI : Request AI to generate quiz
+        OpenAI -> QuizService : Return error
+
+        alt Retry failed after 3 attempts
+            Backend -> Frontend : Notify user: "Quiz Generation Failed"
+            Frontend -> User : Display error message
+
+        else Retry successful
+            QuizService -> Backend : Return generated quiz
+            Backend -> Frontend : Send quiz data
+            Frontend -> User : Display quiz
+
+        end
+    end
+end
+
+@enduml

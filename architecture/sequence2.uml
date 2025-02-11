@@ -1,0 +1,48 @@
+@startuml
+autonumber
+
+skinparam sequence {
+    ActorBackgroundColor #ffcc99
+    ActorBorderColor #ff9966
+    ParticipantBackgroundColor #ccddff
+    ParticipantBorderColor #6699ff
+    ParticipantFontColor #003366
+    ArrowColor #ff6600
+    LifeLineBorderColor #333333
+    LifeLineBackgroundColor #eeeeee
+}
+
+actor User #ffcc99
+participant "EasyQZ Frontend\n(Angular)" as Frontend #ccddff
+participant "REST & WebSocket\n(Spring Boot)" as Backend #ddeeff
+participant "AWS DynamoDB\n(Database)" as Database #ccffcc
+participant "OpenAI API\n(AI Quiz & Insights)" as OpenAI #ffebcc
+participant "News API\n(Trending News Fetcher)" as NewsAPI #ffddaa
+
+== 📰 Auto-Generated News Quizzes ==
+NewsAPI -> Backend: 📡 Fetch trending news
+Backend -> OpenAI: 🤖 Generate quizzes from news articles
+OpenAI -> Backend: ✅ Return AI-generated quizzes
+Backend -> Database: 💾 Store quizzes for users
+User -> Frontend: 🔍 Browse & take latest news quizzes
+Frontend -> Backend: 🚀 Request quizzes
+Backend -> Frontend: 📩 Send available quizzes
+Frontend -> User: 🏆 Display news quiz
+
+== ✍️ AI Story Generation ==
+User -> Frontend: 📝 Enter theme or keywords
+Frontend -> Backend: 🚀 Request AI-generated story
+Backend -> OpenAI: 📖 Generate creative content
+OpenAI -> Backend: ✅ Return generated story
+Backend -> Frontend: 📩 Send story for display
+Frontend -> User: ✨ Show AI-generated story
+
+== 📊 Author Insights ==
+User -> Frontend: 🔍 Request article insights
+Frontend -> Backend: 🔄 Analyze article engagement
+Backend -> OpenAI: 🧠 Evaluate readability, engagement, and retention
+OpenAI -> Backend: ✅ Return insights & recommendations
+Backend -> Frontend: 📊 Send insights to author
+Frontend -> User: 📈 Display feedback & recommendations
+
+@enduml

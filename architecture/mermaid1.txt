@@ -1,0 +1,22 @@
+%%{init: {'themeVariables': { 'primaryColor': '#42A5F5', 'edgeLabelBackground':'#FF7043', 'tertiaryColor': '#4CAF50', 'secondaryColor': '#FFC107' }} }%%
+graph TD
+    A[Angular Frontend] -->|User Interacts| B[Spring Boot Backend]
+    B -->|REST API| C[AWS DynamoDB]
+    B -->|WebSocket| D[OpenAI Platform]
+    C -->|Fetch Data| A
+    D -->|Generate Insights| B
+
+    subgraph "Client Side"
+        A
+    end
+
+    subgraph "Server Side"
+        B
+        C
+        D
+    end
+
+    style A fill:#42A5F5,stroke:#333,stroke-width:2px
+    style B fill:#FF7043,stroke:#333,stroke-width:2px
+    style C fill:#4CAF50,stroke:#333,stroke-width:2px
+    style D fill:#FFC107,stroke:#333,stroke-width:2px

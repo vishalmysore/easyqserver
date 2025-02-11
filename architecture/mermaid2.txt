@@ -1,0 +1,46 @@
+%%{init: {'themeVariables': { 'primaryColor': '#42A5F5', 'edgeLabelBackground':'#FF7043', 'tertiaryColor': '#4CAF50', 'secondaryColor': '#FFC107', 'lineWidth': 2 }} }%%
+graph TD
+    A[Angular Frontend] -->|User Interacts| B[Spring Boot Backend]
+    B -->|REST API| C[AWS DynamoDB]
+    B -->|WebSocket| D[OpenAI Platform]
+    C -->|Fetch Data| A
+    D -->|Generate Insights| B
+    A -->|Fetch Latest News| B
+    B -->|Generate Quiz from News| E[News Quiz Generator]
+    B -->|Generate Quiz from Article| F[Article Quiz Generator]
+    B -->|Generate Insights| G[Author Insights]
+    E -->|Fetch News| C
+    F -->|Fetch Article| C
+    G -->|Fetch Author Info| C
+    E -->|Fetch Data from Web| D
+    F -->|Analyze Article| D
+    G -->|Provide Engagement Stats| D
+    B -->|Send Quiz Results| H[Quiz Results]
+    H -->|Store Quiz Results| C
+    A -->|Display Quiz Results| H
+
+    subgraph "Client Side"
+        A
+    end
+
+    subgraph "Server Side"
+        B
+        C
+        D
+        E
+        F
+        G
+        H
+    end
+
+    style A fill:#42A5F5,stroke:#333,stroke-width:2px
+    style B fill:#FF7043,stroke:#333,stroke-width:2px
+    style C fill:#4CAF50,stroke:#333,stroke-width:2px
+    style D fill:#FFC107,stroke:#333,stroke-width:2px
+    style E fill:#FFCC00,stroke:#333,stroke-width:2px
+    style F fill:#FFCC00,stroke:#333,stroke-width:2px
+    style G fill:#FF7043,stroke:#333,stroke-width:2px
+    style H fill:#42A5F5,stroke:#333,stroke-width:2px
+
+    classDef backend fill:#4CAF50,stroke:#333,stroke-width:2px;
+    class B,C,D,E,F,G,H backend;

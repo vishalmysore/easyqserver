@@ -1,0 +1,35 @@
+@startuml
+autonumber
+
+skinparam sequence {
+    ActorBackgroundColor #ffcc99
+    ActorBorderColor #ff9966
+    ParticipantBackgroundColor #ccddff
+    ParticipantBorderColor #6699ff
+    ParticipantFontColor #003366
+    ArrowColor #ff6600
+    LifeLineBorderColor #333333
+    LifeLineBackgroundColor #eeeeee
+}
+
+actor User #ffcc99
+participant "EasyQZ Frontend\n(Angular)" as Frontend #ccddff
+participant "REST & WebSocket\n(Spring Boot)" as Backend #ddeeff
+participant "AWS DynamoDB\n(Database)" as Database #ccffcc
+participant "OpenAI API\n(AI Quiz Engine)" as OpenAI #ffebcc
+
+User -> Frontend: 🖊 Enter article URL/topic
+Frontend -> Backend: 🔄 Request content analysis
+Backend -> OpenAI: 🤖 Generate quiz using AI
+OpenAI -> Backend: ✅ Return AI-generated quiz
+Backend -> Database: 📦 Store quiz & analytics
+Backend -> Frontend: 📩 Send quiz for display
+Frontend -> User: 📝 Show quiz & questions
+
+User -> Frontend: 🎯 Selects answers
+Frontend -> Backend: ⏳ Send answers for evaluation
+Backend -> Database: 🔍 Store results & update analytics
+Backend -> Frontend: 📊 Send user score & AI feedback
+Frontend -> User: 🏆 Display results & insights
+
+@enduml
