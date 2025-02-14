@@ -5,9 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.vishalmysore.data.QuizType;
 import io.github.vishalmysore.data.Story;
 import io.github.vishalmysore.service.LLMService;
-import io.github.vishalmysore.service.StoryStorageService;
+import io.github.vishalmysore.service.base.StoryDBService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,7 +21,8 @@ public class StoryTellerController {
     @Autowired
     private LLMService llmService;
     @Autowired
-    private StoryStorageService storyStorageService;
+    @Qualifier("storyDBService")
+    private StoryDBService storyDBService;
     @GetMapping("/getStory")
     public Story getStory(@RequestParam("userId") String userId, @RequestParam("storyType")  String storyType) {
         log.info("creating Story for " + userId);
@@ -45,7 +47,7 @@ public class StoryTellerController {
         story.setStoryType(storyType);
         story.setUserId(userId);
         story.setStoryId(storyId);
-        storyStorageService.insertStory(story);
+        storyDBService.insertStory(story);
         return story;
     }
 

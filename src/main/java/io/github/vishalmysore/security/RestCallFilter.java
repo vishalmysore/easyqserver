@@ -1,6 +1,6 @@
 package io.github.vishalmysore.security;
 
-import io.github.vishalmysore.service.UserLoginDynamoService;
+import io.github.vishalmysore.service.base.UserLoginDBSrvice;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,11 +19,12 @@ import java.time.Instant;
 public class RestCallFilter implements Filter {
 
     @Autowired
-    private final UserLoginDynamoService userLoginDynamoService;
+    @Qualifier("userLoginDBService")
+    private final UserLoginDBSrvice userLoginDBSrvice;
 
     @Autowired
-    public RestCallFilter(@Qualifier("userLoginDynamoService") UserLoginDynamoService userLoginDynamoService) {
-        this.userLoginDynamoService = userLoginDynamoService;
+    public RestCallFilter(@Qualifier("userLoginDBService") UserLoginDBSrvice userLoginDBSrvice) {
+        this.userLoginDBSrvice = userLoginDBSrvice;
     }
 
 
@@ -46,7 +47,7 @@ public class RestCallFilter implements Filter {
         log.info("Received " + method + " request for " + uri + " from IP " + ipAddress);
 
         // Inject data into the usage table
-        userLoginDynamoService.insertUsageData(restCallId, ipAddress, timestamp)
+        userLoginDBSrvice.insertUsageData(restCallId, ipAddress, timestamp)
                 .thenAccept(totalUsed -> log.info("Usage Table TotalUsed count: {}, {}",restCallId, totalUsed))
                 .exceptionally(ex -> {
                     log.error("Failed to insert/update usage data: {}", ex.getMessage());

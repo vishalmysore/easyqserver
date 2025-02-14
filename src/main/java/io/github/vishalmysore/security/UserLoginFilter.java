@@ -1,6 +1,6 @@
 package io.github.vishalmysore.security;
 
-import io.github.vishalmysore.service.UserLoginDynamoService;
+import io.github.vishalmysore.service.dynamo.UserLoginDynamoService;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;

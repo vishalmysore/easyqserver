@@ -1,8 +1,9 @@
-package io.github.vishalmysore.service;
+package io.github.vishalmysore.service.dynamo;
 
 import io.github.vishalmysore.chatter.EasyQScoreHandler;
 import io.github.vishalmysore.data.QuizType;
 import io.github.vishalmysore.data.Score;
+import io.github.vishalmysore.service.base.QuizResultsDBService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -15,7 +16,7 @@ import java.util.Map;
 
 @Slf4j
 @Service("quizResultsDynamoService")
-public class QuizResultsDynamoService extends AWSDynamoService {
+public class QuizResultsDynamoService extends AWSDynamoService implements QuizResultsDBService {
 
     protected static final String USER_LATEST_SCORE = "user_score";
 

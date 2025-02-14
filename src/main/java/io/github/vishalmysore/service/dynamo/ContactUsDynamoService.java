@@ -1,6 +1,7 @@
-package io.github.vishalmysore.service;
+package io.github.vishalmysore.service.dynamo;
 
 import io.github.vishalmysore.data.ContactUs;
+import io.github.vishalmysore.service.base.ContactUsDBService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.java.Log;
 import org.springframework.scheduling.annotation.Async;
@@ -15,7 +16,7 @@ import java.util.Map;
 
 @Log
 @Service ("contactUsDynamoService")
-public class ContactUsDynamoService extends AWSDynamoService {
+public class ContactUsDynamoService extends AWSDynamoService implements ContactUsDBService {
     protected static final String CONTACTUS_TABLE_NAME = "contactus";
 
     @PostConstruct
@@ -105,7 +106,7 @@ public class ContactUsDynamoService extends AWSDynamoService {
     }
 
     @Async
-    public void insertScore(ContactUs score) {
+    public void insertSupportTicket(ContactUs score) {
         try {
             if (dynamoDbClient == null) {
                 log.severe("DynamoDbClient is not initialized. Ensure that init() is called first.");

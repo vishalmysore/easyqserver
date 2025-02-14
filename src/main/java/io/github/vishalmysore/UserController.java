@@ -2,10 +2,11 @@ package io.github.vishalmysore;
 
 import io.github.vishalmysore.data.NewUser;
 import io.github.vishalmysore.security.JwtUtil;
-import io.github.vishalmysore.service.UserLoginDynamoService;
+import io.github.vishalmysore.service.base.UserLoginDBSrvice;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,7 +20,8 @@ import java.util.Map;
 @Slf4j
 public class UserController {
     @Autowired
-    private UserLoginDynamoService userLoginDynamoService;
+    @Qualifier("userLoginDBService")
+    private UserLoginDBSrvice userLoginDBSrvice;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -33,7 +35,7 @@ public class UserController {
             user.setEmailId(fakeEmail); // Set the generated email address
         }
 
-        boolean userCreated = userLoginDynamoService.createTempUser(user.getUserId(), user.getEmailId(),remoteIpAddress); // Track user login
+        boolean userCreated = userLoginDBSrvice.createTempUser(user.getUserId(), user.getEmailId(),remoteIpAddress); // Track user login
         if(!userCreated) {
             return ResponseEntity.badRequest().build();
         }
@@ -44,6 +46,7 @@ public class UserController {
         response.put("token", jwtToken);
         response.put("userId", user.getUserId());
         response.put("emailId", user.getEmailId());
+        log.info("Jwt token generated for user: " +jwtToken);
         return ResponseEntity.ok(response);
     }
 
@@ -57,6 +60,18 @@ public class UserController {
         response.put("userId", userId);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/logoutGoogle")
+    public ResponseEntity<Map<String, String>> logoutGoogle(HttpServletRequest request) {
+        String remoteIpAddress = request.getRemoteAddr();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = (String) authentication.getPrincipal();
+        log.info("Logged out Google User: " + userId);
+        Map<String, String> response = new HashMap<>();
+        response.put("userId", userId);
+        return ResponseEntity.ok(response);
+    }
+
   }
 
 

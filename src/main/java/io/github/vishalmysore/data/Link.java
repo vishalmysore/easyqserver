@@ -13,4 +13,5 @@ public class Link {
     private String url;
     private String author;
     private int totalAccessCount;
+    private String keywords;
 }

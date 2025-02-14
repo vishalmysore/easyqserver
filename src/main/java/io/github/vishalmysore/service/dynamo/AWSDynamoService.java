@@ -1,6 +1,8 @@
-package io.github.vishalmysore.service;
+package io.github.vishalmysore.service.dynamo;
 
 import io.github.vishalmysore.data.Link;
+import io.github.vishalmysore.service.LLMService;
+import io.github.vishalmysore.service.base.BaseDBService;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -14,17 +16,16 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.*;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service("awsDynamoService")
 @Slf4j
-public class AWSDynamoService {
+public class AWSDynamoService implements BaseDBService {
 
     @Getter
     protected  DynamoDbClient dynamoDbClient;
@@ -70,58 +71,8 @@ public class AWSDynamoService {
     }
 
 
-    @Async
-    public CompletableFuture<Integer> insertUsageData(String restCallId, String ipAddress, String timestamp) {
-        try {
-            // Check if the item exists
-            GetItemRequest getItemRequest = GetItemRequest.builder()
-                    .tableName(USAGE_TABLE_NAME)
-                    .key(Map.of("restCallId", AttributeValue.builder().s(restCallId).build()))
-                    .build();
 
-            GetItemResponse getItemResponse = dynamoDbClient.getItem(getItemRequest);
-
-            int totalUsed;
-            if (getItemResponse.hasItem()) {
-                // Item exists, update totalUsed
-                totalUsed = Integer.parseInt(getItemResponse.item().get("totalUsed").n()) + 1;
-
-                UpdateItemRequest updateItemRequest = UpdateItemRequest.builder()
-                        .tableName(USAGE_TABLE_NAME)
-                        .key(Map.of("restCallId", AttributeValue.builder().s(restCallId).build()))
-                        .updateExpression("SET totalUsed = :newTotal, ipaddress = :ip")
-                        .expressionAttributeValues(Map.of(
-                                ":newTotal", AttributeValue.builder().n(String.valueOf(totalUsed)).build(),
-                                ":ip", AttributeValue.builder().s(ipAddress).build()
-
-                        ))
-                        .build();
-
-                dynamoDbClient.updateItem(updateItemRequest);
-                log.info("Updated totalUsed count to {} for restCallId {}", totalUsed, restCallId);
-            } else {
-                // Item does not exist, insert new entry with totalUsed = 1
-                totalUsed = 1;
-                Map<String, AttributeValue> item = new HashMap<>();
-                item.put("restCallId", AttributeValue.builder().s(restCallId).build());
-                item.put("ipaddress", AttributeValue.builder().s(ipAddress).build());
-                item.put("totalUsed", AttributeValue.builder().n("1").build());
-                item.put("timestamp", AttributeValue.builder().s(timestamp).build());
-                PutItemRequest putItemRequest = PutItemRequest.builder()
-                        .tableName(USAGE_TABLE_NAME)
-                        .item(item)
-                        .build();
-
-                dynamoDbClient.putItem(putItemRequest);
-                log.info("Inserted new entry with totalUsed = 1 for restCallId {}", restCallId);
-            }
-
-            return CompletableFuture.completedFuture(totalUsed);
-        } catch (DynamoDbException e) {
-            log.error("Failed to insert/update data in 'usage' table: {}", e.getMessage());
-            return CompletableFuture.failedFuture(e);
-        }
-    }
+    @Override
     @Async
     public void saveOrUpdateLink(String url, String data) {
         String id = generateSHA256Hash(url); // Unique ID based on URL
@@ -140,16 +91,17 @@ public class AWSDynamoService {
             updateLink(id);
         } else {
             String author = llmService.callLLM(" who is the author of this article just provide the name and nothing else, if you cannot find the name just return unknown "+data);
-            String keywords = llmService.callLLM(" what topic does this cover giving comma 5 separated topics for example java,programming  "+data);
+            String keywords = llmService.callLLM(" what topics does this cover? give comma separated topics and limit it to top 5 ,for example java,programming,spring,awt,mongodb  "+data);
             // Insert new record
             createNewLink(id, url, author, data,keywords);
         }
     }
 
+    @Override
     /**
      * Creates a new link entry in DynamoDB.
      */
-    private void createNewLink(String id, String url, String author, String data,String keywords) {
+    public void createNewLink(String id, String url, String author, String data,String keywords) {
         Map<String, AttributeValue> item = new HashMap<>();
         item.put("id", AttributeValue.builder().s(id).build());
         item.put("url", AttributeValue.builder().s(url).build());
@@ -168,10 +120,11 @@ public class AWSDynamoService {
         log.info("New link added: " + url);
     }
 
+    @Override
     /**
      * Updates the lastUsed timestamp and increments totalAccessCount.
      */
-    private void updateLink(String id) {
+    public void updateLink(String id) {
         UpdateItemRequest updateRequest = UpdateItemRequest.builder()
                 .tableName(TABLE_NAME)
                 .key(Map.of("id", AttributeValue.builder().s(id).build()))
@@ -186,15 +139,8 @@ public class AWSDynamoService {
         log.info("Updated link with id: " + id);
     }
 
-    protected String generateSHA256Hash(String url) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(url.getBytes(StandardCharsets.UTF_8));
-            return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Error generating hash", e);
-        }
-    }
+
+
     protected  void waitForTableToBecomeActive(DynamoDbClient dynamoDbClient, String tableName) {
         while (true) {
             try {
@@ -382,6 +328,7 @@ public class AWSDynamoService {
         }
     }
 
+
     private void createLoginUser() {
         try {
             if (dynamoDbClient == null) {
@@ -480,10 +427,11 @@ public class AWSDynamoService {
         for (Map<String, AttributeValue> item : scanResponse.items()) {
             String url = item.get("url").s();
             String author = item.get("author").s();
+            String keywords = item.get("keywords").s();
             int totalAccessCount = Integer.parseInt(item.get("totalAccessCount").n());
 
             // Add the Article to the list
-            trendingArticles.add(new Link(url, author, totalAccessCount));
+            trendingArticles.add(new Link(url, author, totalAccessCount,keywords));
         }
 
 
@@ -494,6 +442,7 @@ public class AWSDynamoService {
         return trendingArticles;
     }
 
+    @Override
     public List<Link> getAllTimeTrendingArticles() {
         // Scan all items in the table
         ScanRequest scanRequest = ScanRequest.builder()
@@ -522,10 +471,11 @@ public class AWSDynamoService {
             Map<String, AttributeValue> article = trendingArticles.get(i);
             String url = article.get("url").s();
             String author = article.get("author").s();
+            String keywords = article.get("keywords").s();
             int totalAccessCount = Integer.parseInt(article.get("totalAccessCount").n());
 
             // Add the Article to the list
-            trendingArticlesLink.add(new Link(url, author, totalAccessCount));
+            trendingArticlesLink.add(new Link(url, author, totalAccessCount,keywords));
         }
         return trendingArticlesLink;
     }

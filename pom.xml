@@ -11,10 +11,10 @@
     </parent>
     <groupId>io.github.vishalmysore</groupId>
     <artifactId>easyQServer</artifactId>
-    <version>0.2.8.9.3</version>
+    <version>0.2.8.9.5</version>
     <name>Tools For Artificial Intelligence</name>
     <description>
-        EasyQZ is an AI Powered quiz generation tool that allows users to generate quizzes from any article, link, topic, or custom text. Whether you're a student, educator, or professional, EasyQ helps you test your knowledge, compete with others, and discover trending topics.
+        EasyQZ is an AI Deep Research agent for quiz generation that allows users to generate quizzes from any article, link, topic, or custom text. Whether you're a student, educator, or professional, EasyQ helps you test your knowledge, compete with others, and discover trending topics.
     </description>
     <url>https://github.com/vishalmysore/easyqz</url>
     <licenses>
@@ -44,6 +44,16 @@
 
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-sync</artifactId>
+            <version>4.11.1</version> <!-- Check for the latest version -->
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-reactivestreams</artifactId>
+            <version>4.11.1</version>
+        </dependency>
 
             <!-- Spring Boot Starter Web (Includes WebSocket) -->
             <dependency>
@@ -164,6 +174,15 @@
             <artifactId>slf4j-tinylog</artifactId>
             <version>2.6.2</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot -->
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-mongodb -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+
+        </dependency>
+
+
         <dependency>
             <groupId>com.microsoft.playwright</groupId>
             <artifactId>playwright</artifactId>

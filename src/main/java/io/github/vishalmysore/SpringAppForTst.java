@@ -9,7 +9,7 @@ import io.github.vishalmysore.service.LLMService;
 
 public class SpringAppForTst {
     public static void main(String[] args) throws JsonProcessingException {
-        LLMService llmService = new LLMService(); // Manually create an instance
+        LLMService llmService = new LLMService("modelName"); // Manually create an instance
         String storyType = "horror"; // Example: Change this dynamically
         String prompt = "Can you give a story of type " + storyType + " with around 500 words? " +
                 "It should not have any bad words or sensitive content. Also, please provide 10 questions based on the story. " +

@@ -1,5 +1,6 @@
 package io.github.vishalmysore.security;
 
+import io.github.vishalmysore.data.GoogleUser;
 import io.github.vishalmysore.service.GoogleAuthService;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,13 +35,15 @@ public class GoogleAuthFilter implements Filter {
                     }
                     // Validate and fetch user details using the Google token
                     boolean isValidToken = googleAuthService.validateGoogleToken(token);
-
+                    GoogleUser googleUser = googleAuthService.getUserInfo(token);
                     if (isValidToken) {
+                        request.setAttribute("googleUser", googleUser); // Store the user details in the request
                         // Allow the request to continue if token is valid
                         log.info("Google token is valid.");
                         chain.doFilter(request, response);
                     } else {
                         // Reject the request if the token is invalid
+                        log.info("Google token is not valid.");
                         response.getWriter().write("Access Denied: Invalid Google Token.");
                         response.getWriter().flush();
                     }

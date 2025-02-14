@@ -13,6 +13,6 @@ public class GoogleUser {
     private String sub;  // User ID
     private String email;
     private String name;
-
-    // Getters and setters
+    private String createdTimestamp;  // Added timestamp for creation
+    private String easyQZUserId;
 }

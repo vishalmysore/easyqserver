@@ -1,11 +1,9 @@
 package io.github.vishalmysore.security;
 
-import io.github.vishalmysore.service.AWSDynamoService;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 
@@ -14,8 +12,7 @@ public class HostFilter implements Filter {
 
     private final HostValidator hostValidator;
 
-    @Autowired
-    private AWSDynamoService awsDynamoService;
+
 
     // Constructor
     public HostFilter(HostValidator hostValidator) {

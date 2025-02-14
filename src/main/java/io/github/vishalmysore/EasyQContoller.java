@@ -6,9 +6,12 @@ import io.github.vishalmysore.data.Link;
 import io.github.vishalmysore.data.Question;
 import io.github.vishalmysore.data.Quiz;
 import io.github.vishalmysore.data.QuizType;
-import io.github.vishalmysore.service.*;
+import io.github.vishalmysore.service.LLMService;
+import io.github.vishalmysore.service.ScraperService;
+import io.github.vishalmysore.service.base.BaseDBService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,13 +34,10 @@ public class EasyQContoller {
     private ScraperService scraperService;
 
     @Autowired
-    private AWSDynamoService awsDynamoService;
+    @Qualifier("dbService")
+    private BaseDBService baseDBService;
 
-    @Autowired
-    private UserLoginDynamoService userLoginDynamoService;
 
-    @Autowired
-    private QuizResultsDynamoService quizResultsDynamoService;
 
     @GetMapping("/getQuestions")
     public Quiz getQuestions(@RequestParam("prompt") String prompt, @RequestParam("difficulty")  int difficulty) {
@@ -59,7 +59,7 @@ public class EasyQContoller {
 
              }
          }
-         awsDynamoService.saveOrUpdateLink(prompt,webData);
+         baseDBService.saveOrUpdateLink(prompt,webData);
          quizId = QuizType.LINK.toString()+"_"+quizId;
      } else {
          quizId = QuizType.TOPIC.toString()+"_"+quizId;
@@ -105,11 +105,11 @@ public class EasyQContoller {
 
     @GetMapping("/getTrendingLastHour")
     public List<Link> getTrendingLastHour() {
-        return awsDynamoService.getTrendingArticlesInLastHour();
+        return baseDBService.getTrendingArticlesInLastHour();
     }
 
     @GetMapping("/getTrendingAll")
     public List<Link> getTrendingAll() {
-        return awsDynamoService.getAllTimeTrendingArticles();
+        return baseDBService.getAllTimeTrendingArticles();
     }
 }

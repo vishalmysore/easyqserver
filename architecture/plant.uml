@@ -1,0 +1,107 @@
+@startuml
+skinparam backgroundColor #EEEBDC
+skinparam handwritten true
+
+skinparam sequence {
+ArrowColor DeepSkyBlue
+ActorBorderColor DeepSkyBlue
+LifeLineBorderColor blue
+LifeLineBackgroundColor #A9DCDF
+
+ParticipantBorderColor DeepSkyBlue
+ParticipantBackgroundColor DodgerBlue
+ParticipantFontName Impact
+ParticipantFontSize 17
+ParticipantFontColor #A9DCDF
+
+ActorBackgroundColor aqua
+ActorFontColor DeepSkyBlue
+ActorFontSize 17
+ActorFontName Aapex
+}
+
+skinparam rectangle {
+ArrowColor DeepSkyBlue
+ActorBorderColor DeepSkyBlue
+LifeLineBorderColor blue
+LifeLineBackgroundColor #A9DCDF
+
+ParticipantBorderColor DeepSkyBlue
+ParticipantBackgroundColor DodgerBlue
+ParticipantFontName Impact
+ParticipantFontSize 17
+ParticipantFontColor #A9DCDF
+
+ActorBackgroundColor aqua
+ActorFontColor DeepSkyBlue
+ActorFontSize 17
+ActorFontName Aapex
+}
+left to right direction
+
+actor User
+
+' REST calls (Middle) - Each as a separate box
+rectangle "POST /placeOrder\nParameters: type=golf, color=blue, quantity=100" as placeOrder
+rectangle "POST /bulkOrder\nParameters: type=table tennis, color=white, quantity=2000" as bulkOrder
+rectangle "POST /customOrder\nParameters: type=soccer, customization=logo, quantity=50" as customOrder
+rectangle "GET /inventory\nParameters: type=soccer, color=red, quantity=500" as inventoryCheck
+rectangle "GET /shipping/12345\nParameters: orderId=12345" as shippingStatus
+rectangle "POST /return\nParameters: orderId=54321" as returnOrder
+
+' Middle - Tools4AI - Routing
+rectangle "Tools4AI - Route Prompts to API Endpoints" as tools4AI
+
+' Connections from User to Tools4AI and then to API Endpoints
+User --> tools4AI : "Order 100 blue golf balls"
+tools4AI --> placeOrder
+
+User --> tools4AI : "I need 2000 white table tennis balls"
+tools4AI --> bulkOrder
+
+User --> tools4AI : "Customize 50 soccer balls with our logo"
+tools4AI --> customOrder
+
+User --> tools4AI : "Check if you have 500 red soccer balls in stock"
+tools4AI --> inventoryCheck
+
+User --> tools4AI : "Where is my order 12345?"
+tools4AI --> shippingStatus
+
+User --> tools4AI : "I want to return order 54321"
+tools4AI --> returnOrder
+
+' Styling and Colorization
+rectangle User {
+
+}
+
+rectangle tools4AI {
+
+}
+
+rectangle placeOrder {
+
+}
+
+rectangle bulkOrder {
+
+}
+
+rectangle customOrder {
+
+}
+
+rectangle inventoryCheck {
+
+}
+
+rectangle shippingStatus {
+
+}
+
+rectangle returnOrder {
+
+}
+
+@enduml
