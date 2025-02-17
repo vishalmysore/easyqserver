@@ -2,6 +2,7 @@ package io.github.vishalmysore.service.dynamo;
 
 import io.github.vishalmysore.service.base.UserLoginDBSrvice;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.dynamodb.model.*;
@@ -12,12 +13,12 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
-@Service("userLoginDynamoService")
-
+@Service("userLoginDBService")
+@ConditionalOnProperty(name = "easyQZ_DBTYPE", havingValue = "aws", matchIfMissing = true)
 public class UserLoginDynamoService extends AWSDynamoService implements UserLoginDBSrvice {
 
     @Override
-    public boolean updateUser(String userId) {
+    public boolean makeUserPermanent(String userId,String emailId) {
         try {
             // Step 1: Check if the user exists
             GetItemRequest getItemRequest = GetItemRequest.builder()
@@ -77,7 +78,7 @@ public class UserLoginDynamoService extends AWSDynamoService implements UserLogi
     }
 
     @Override
-    public boolean createTempUser(String userId, String emailId, String ipAddress) {
+    public boolean createTempUser(String userId, String emailId, String ipAddress,String avatar) {
         try {
             // Step 1: Check if the user exists
             GetItemRequest getItemRequest = GetItemRequest.builder()
@@ -239,4 +240,7 @@ public class UserLoginDynamoService extends AWSDynamoService implements UserLogi
         }
     }
 
+    public void recordUserLogout(String userId)  {
+      log.error("Method not implemented");
+    }
 }

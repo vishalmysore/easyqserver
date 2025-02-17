@@ -9,7 +9,14 @@ import java.util.Map;
 
 public interface ArticleScoringDBService {
     public void insertScore(Score score, EasyQNotificationHandler easyQNotificationHandler);
-    public  Link mapToLink(Map<String, AttributeValue> item);
-    public Link getLinkByUrl(String url);
 
+    public Link getLinkByUrl(String url);
+    public default Link mapToLink(Map<String, AttributeValue> item) {
+        return new Link(
+                item.get("url").s(),
+                item.get("author").s(),
+                Integer.parseInt(item.get("totalAccessCount").n()),
+                item.get("keywords").s()
+        );
+    }
 }

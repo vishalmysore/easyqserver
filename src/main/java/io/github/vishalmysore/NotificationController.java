@@ -50,7 +50,8 @@ public class NotificationController {
                     "userId", score.getUserId(),
                     "linkUrl", score.getUrl(),
                     "currentScore", score.getTotalScore(),
-                    "topics", score.getTopics() // Assuming topics is a List<String>
+                    "topics", score.getTopics(),
+                    "quizType",score.getQuizType()// Assuming topics is a List<String>
             );
 
             // Convert to JSON string

@@ -4,6 +4,7 @@ import io.github.vishalmysore.data.GoogleUser;
 import io.github.vishalmysore.service.base.GoogleDBService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.services.dynamodb.model.*;
@@ -12,7 +13,8 @@ import java.time.Instant;
 import java.util.Map;
 
 @Slf4j
-@Service("googleDynamoService")
+@Service("googleDBService")
+@ConditionalOnProperty(name = "easyQZ_DBTYPE", havingValue = "aws", matchIfMissing = true)
 public class GoogleDynamoService extends AWSDynamoService implements GoogleDBService {
     protected static final String GOOGLEUSERS_TABLE_NAME = "google_users";
     public static String LOGIN_TIME = "loginTime";
@@ -21,7 +23,6 @@ public class GoogleDynamoService extends AWSDynamoService implements GoogleDBSer
     public void init() {
         super.init();
         createGoogleUserTable();
-        insertGoogleUser(new GoogleUser("12345", "user@example.com", "John Doe", Instant.now().toString(),"helloUser"));  // Example usage with timestamp
     }
 
     private void createGoogleUserTable() {
@@ -138,6 +139,7 @@ public class GoogleDynamoService extends AWSDynamoService implements GoogleDBSer
         }
     }
     // Method to retrieve a GoogleUser by email from the DynamoDB table
+    @Override
     public GoogleUser getGoogleUserByEmail(String email) {
         try {
             // Retrieve the item by email
@@ -159,7 +161,7 @@ public class GoogleDynamoService extends AWSDynamoService implements GoogleDBSer
                 String createdTimestamp = item.get("createdTimestamp").s();
                 String easyQZUserId = item.get("easyQZUserId").s();
                 // Create a GoogleUser object from the retrieved data
-                return new GoogleUser(sub, email, name, createdTimestamp,easyQZUserId);
+                return new GoogleUser(sub, email, name, createdTimestamp,easyQZUserId,"");
             } else {
                 log.info("No user found with email: " + email);
                 return null;

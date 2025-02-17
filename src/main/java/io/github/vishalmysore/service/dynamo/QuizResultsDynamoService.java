@@ -6,6 +6,7 @@ import io.github.vishalmysore.data.Score;
 import io.github.vishalmysore.service.base.QuizResultsDBService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.exception.SdkException;
@@ -15,7 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@Service("quizResultsDynamoService")
+@Service("quizResultsDBService")
+@ConditionalOnProperty(name = "easyQZ_DBTYPE", havingValue = "aws", matchIfMissing = true)
 public class QuizResultsDynamoService extends AWSDynamoService implements QuizResultsDBService {
 
     protected static final String USER_LATEST_SCORE = "user_score";

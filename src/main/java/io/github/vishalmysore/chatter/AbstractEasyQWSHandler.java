@@ -1,7 +1,9 @@
 package io.github.vishalmysore.chatter;
 
+import io.github.vishalmysore.service.base.UserLoginDBSrvice;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
@@ -13,6 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class AbstractEasyQWSHandler extends AbstractWebSocketHandler {
     @Getter
     protected final Map<String, WebSocketSession> userSessions = new ConcurrentHashMap<>();
+    @Autowired
+    private UserLoginDBSrvice userLoginDBSrvice;
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         // Retrieve the token and userId from the session attributes
@@ -42,6 +46,7 @@ public abstract class AbstractEasyQWSHandler extends AbstractWebSocketHandler {
         if (userId != null) {
             userSessions.remove(userId);
             log.info("Session removed for user: " + userId);
+            userLoginDBSrvice.recordUserLogout(userId);
         }
     }
 }

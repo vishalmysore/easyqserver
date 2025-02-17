@@ -1,6 +1,6 @@
 package io.github.vishalmysore.security;
 
-import io.github.vishalmysore.service.dynamo.UserLoginDynamoService;
+import io.github.vishalmysore.service.base.UserLoginDBSrvice;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,15 +23,15 @@ import java.util.List;
 public class UserLoginFilter implements Filter {
 
 
-    private final UserLoginDynamoService userLoginDynamoService;
+    private final UserLoginDBSrvice userLoginDBSrvice;
     private static final List<String> EXCLUDED_URLS = List.of("/api/createNewTempUser","/auth/google","/favicon.ico","/bs/");
 
     @Autowired
     private JwtUtil jwtUtil;
 
     @Autowired
-    public UserLoginFilter(@Qualifier("userLoginDynamoService") UserLoginDynamoService userLoginDynamoService) {
-        this.userLoginDynamoService = userLoginDynamoService;
+    public UserLoginFilter(@Qualifier("userLoginDBService")  UserLoginDBSrvice userLoginDBSrvice) {
+        this.userLoginDBSrvice = userLoginDBSrvice;
     }
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -103,7 +103,7 @@ public class UserLoginFilter implements Filter {
                 log.info("User ID from JWT: " + userId);
                 SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userId, null, new ArrayList<>()));
                 // Call the service to update the login data (user login, etc.)
-                userLoginDynamoService.trackUserLogin(userId,"temp", clientIp);
+              //  userLoginDBSrvice.trackUserLogin(userId,"temp", clientIp);
 
         } else {
             log.warn("No JWT token found in the request.");

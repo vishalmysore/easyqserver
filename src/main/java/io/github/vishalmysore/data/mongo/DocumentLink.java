@@ -1,5 +1,6 @@
-package io.github.vishalmysore.service.mongo;
+package io.github.vishalmysore.data.mongo;
 
+import io.github.vishalmysore.data.Link;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,8 @@ public class DocumentLink {
     private Instant lastUsed;
     private int totalAccessCount;
 
-
+    public Link toLink() {
+        return new Link(url, author, totalAccessCount, keywords);
+    }
     // Getters and Setters
 }

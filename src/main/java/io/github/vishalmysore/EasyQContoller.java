@@ -9,7 +9,7 @@ import io.github.vishalmysore.data.QuizType;
 import io.github.vishalmysore.service.LLMService;
 import io.github.vishalmysore.service.ScraperService;
 import io.github.vishalmysore.service.base.BaseDBService;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 
-@Log
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class EasyQContoller {
@@ -90,7 +90,7 @@ public class EasyQContoller {
                 // Convert the string to a list of Question objects
                 questions = objectMapper.readValue(jsonQustions, new TypeReference<List<Question>>(){});
             } catch (Exception e1) {
-                log.severe("LLM failed to generate questions");
+                log.error("LLM failed to generate questions");
 
             }
 

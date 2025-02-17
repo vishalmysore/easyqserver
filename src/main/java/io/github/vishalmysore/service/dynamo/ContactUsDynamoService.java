@@ -4,6 +4,7 @@ import io.github.vishalmysore.data.ContactUs;
 import io.github.vishalmysore.service.base.ContactUsDBService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.java.Log;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.exception.SdkException;
@@ -15,7 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Log
-@Service ("contactUsDynamoService")
+@Service("contactUsDBService")
+@ConditionalOnProperty(name = "easyQZ_DBTYPE", havingValue = "aws", matchIfMissing = true)
 public class ContactUsDynamoService extends AWSDynamoService implements ContactUsDBService {
     protected static final String CONTACTUS_TABLE_NAME = "contactus";
 

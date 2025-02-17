@@ -1,7 +1,7 @@
 package io.github.vishalmysore.service.mongo;
 
 import io.github.vishalmysore.data.Link;
-import io.github.vishalmysore.data.UsageData;
+import io.github.vishalmysore.data.mongo.DocumentLink;
 import io.github.vishalmysore.service.LLMService;
 import io.github.vishalmysore.service.base.BaseDBService;
 import jakarta.annotation.PostConstruct;
@@ -9,21 +9,25 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.data.mongodb.core.index.Index;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Slf4j
-@Service("mongoService")
+@Service("dbService")
 public class MongoService implements BaseDBService {
 
     @Autowired
-    private MongoTemplate mongoTemplate;
+    protected MongoTemplate mongoTemplate;
 
     @Autowired
     private LLMService llmService;
@@ -31,8 +35,16 @@ public class MongoService implements BaseDBService {
     private String dbType;
 
     private static final String COLLECTION_NAME = "links";
-    private static final String USAGE_COLLECTION_NAME = "usage"; // Holds usage data like rest calls and IP addresses
+    protected static final String USAGE_COLLECTION_NAME = "usage"; // Holds usage data like rest calls and IP addresses
     protected  String LOGINUSER_TABLE_NAME ="loginuser";
+
+    protected  final String STORIES_TABLE_NAME = "stories";
+
+    protected static final String USER_LATEST_SCORE = "user_score";
+
+    protected static final String GOOGLEUSERS_TABLE_NAME = "google_users";
+
+    protected static final String CONTACTUS_TABLE_NAME = "contactus";
 
     @PostConstruct
     @ConditionalOnProperty(name = "easyQZ_DBTYPE", havingValue = "mongo", matchIfMissing = true)
@@ -55,17 +67,47 @@ public class MongoService implements BaseDBService {
             if (!mongoTemplate.collectionExists(USAGE_COLLECTION_NAME)) {
                 mongoTemplate.createCollection(USAGE_COLLECTION_NAME);
                 log.info("Created collection: " + USAGE_COLLECTION_NAME);
+                mongoTemplate.indexOps(USAGE_COLLECTION_NAME).ensureIndex(
+                        new Index().on("timestamp", org.springframework.data.domain.Sort.Direction.ASC)
+                                .expire(259200) // 3 days (in seconds)
+                );
+
+                log.info("TTL index set on timestamp field: 3 days expiry");
             }
             if (!mongoTemplate.collectionExists(LOGINUSER_TABLE_NAME)) {
                 mongoTemplate.createCollection(LOGINUSER_TABLE_NAME);
                 log.info("Created collection: " + LOGINUSER_TABLE_NAME);
+            }
+            if (!mongoTemplate.collectionExists(STORIES_TABLE_NAME)) {
+                mongoTemplate.createCollection(STORIES_TABLE_NAME);
+                log.info("Created collection: " + STORIES_TABLE_NAME);
+            }
+            if (!mongoTemplate.collectionExists(USER_LATEST_SCORE)) {
+                mongoTemplate.createCollection(USER_LATEST_SCORE);
+                log.info("Created collection: " + USER_LATEST_SCORE);
+            }
+
+            if (!mongoTemplate.collectionExists(GOOGLEUSERS_TABLE_NAME)) {
+                mongoTemplate.createCollection(GOOGLEUSERS_TABLE_NAME);
+                log.info("Created collection: " + GOOGLEUSERS_TABLE_NAME);
+            }
+
+            if (!mongoTemplate.collectionExists(CONTACTUS_TABLE_NAME)) {
+                mongoTemplate.createCollection(CONTACTUS_TABLE_NAME);
+                log.info("Created collection: " + CONTACTUS_TABLE_NAME);
+                mongoTemplate.indexOps(CONTACTUS_TABLE_NAME).ensureIndex(
+                        new Index().on("createdTime", org.springframework.data.domain.Sort.Direction.ASC)
+                                .expire(259200) // 3 days (in seconds)
+                );
+
+                log.info("TTL index set on timestamp field: 3 days expiry");
             }
         } catch (Exception e) {
             log.error("Failed to create collections: {}", e.getMessage());
         }
     }
 
-    @Async
+   /* @Async
     public CompletableFuture<Integer> insertUsageData(String restCallId, String ipAddress, String timestamp) {
         int totalUsed = 0; // Initialize the variable to store total usage count
 
@@ -96,6 +138,8 @@ public class MongoService implements BaseDBService {
         // Return the totalUsed value asynchronously
         return CompletableFuture.completedFuture(totalUsed);
     }
+    */
+
 
 
     public void saveOrUpdateLink(String url, String data) {
@@ -138,14 +182,28 @@ public class MongoService implements BaseDBService {
 
     @Override
     public List<Link> getTrendingArticlesInLastHour() {
-        return List.of();
+        long oneHourAgo = System.currentTimeMillis() - (60 * 60 * 1000); // Current time minus 1 hour
+        Query query = new Query();
+        query.addCriteria(Criteria.where("lastUsed").gte(new Date(oneHourAgo))); // Articles accessed in the last hour
+        query.with(Sort.by(Sort.Order.desc("totalAccessCount"))); // Sort by total access count (most accessed first)
+        List<DocumentLink> documentLinks = mongoTemplate.find(query, DocumentLink.class);
+        return documentLinks.stream()
+                .map(DocumentLink::toLink)  // Convert each DocumentLink to Link
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<Link> getAllTimeTrendingArticles() {
-        return List.of();
-    }
+        Query query = new Query();
+        query.with(Sort.by(Sort.Order.desc("totalAccessCount"))); // Sort by total access count
 
+        List<DocumentLink> documentLinks = mongoTemplate.find(query, DocumentLink.class);
+
+        // Convert DocumentLink to Link using toLink() method and return as List<Link>
+        return documentLinks.stream()
+                .map(DocumentLink::toLink)  // Convert each DocumentLink to Link
+                .collect(Collectors.toList());  // Collect the results into a List<Link>
+    }
 
 
 

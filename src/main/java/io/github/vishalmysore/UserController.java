@@ -35,7 +35,7 @@ public class UserController {
             user.setEmailId(fakeEmail); // Set the generated email address
         }
 
-        boolean userCreated = userLoginDBSrvice.createTempUser(user.getUserId(), user.getEmailId(),remoteIpAddress); // Track user login
+        boolean userCreated = userLoginDBSrvice.createTempUser(user.getUserId(), user.getEmailId(),remoteIpAddress,user.getAvatar()); // Track user login
         if(!userCreated) {
             return ResponseEntity.badRequest().build();
         }

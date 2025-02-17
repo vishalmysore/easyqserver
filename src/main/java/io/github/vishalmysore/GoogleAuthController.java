@@ -60,7 +60,7 @@ public class GoogleAuthController {
             userId = existingUser.getEasyQZUserId();
             googleDBService.updateLoginAndLogoutTime(googleUser.getEmail(),GoogleDynamoService.LOGIN_TIME);
         }
-        userLoginDBService.updateUser(userId);
+        userLoginDBService.makeUserPermanent(userId,googleUser.getEmail());
 //        String userId = jwtUtil.getUserId(jwtToken);    //if user is not authenticated create a random and send
 //        log.info("User ID: " + userId);
 //        if(userId == null || userId.isEmpty()) {

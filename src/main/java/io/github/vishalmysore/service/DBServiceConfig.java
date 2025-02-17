@@ -6,9 +6,8 @@ import io.github.vishalmysore.service.mongo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
+@Deprecated
 public class DBServiceConfig {
 
     @Value("${easyQZ_DBTYPE}")
@@ -72,9 +71,10 @@ public class DBServiceConfig {
 
     @Bean
     public UserLoginDBSrvice userLoginDBService() {
-        if ("aws".equalsIgnoreCase(dbType)) {
-            return userLoginDynamoService;
-        } else if ("mongo".equalsIgnoreCase(dbType)) {
+      //  if ("aws".equalsIgnoreCase(dbType)) {
+        //    return userLoginDynamoService;
+       // } else
+            if ("mongo".equalsIgnoreCase(dbType)) {
             return userLoginMongoService;
         }
         throw new IllegalStateException("Unsupported DBTYPE for UserLogin: " + dbType);

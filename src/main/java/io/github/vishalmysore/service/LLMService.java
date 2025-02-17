@@ -77,13 +77,13 @@ public class LLMService {
 
     private static String enhancePrompt(int difficulty, String prompt) {
         if(difficulty == 2) {
-            prompt =prompt +" please make sure questions are medium difficulty ";
+            prompt =prompt +" please make sure questions are of medium difficulty ";
         }
         if(difficulty == 3) {
-            prompt =prompt +" please make sure questions are hard difficulty ";
+            prompt =prompt +" please make sure questions are very difficult to handle";
         }
         if(difficulty == 4) {
-            prompt =prompt +" please make sure questions are related to subject but out of the box ";
+            prompt =prompt +" please make sure questions are related to subject but out of the box and extremely difficult to handle";
         }
         return prompt;
     }

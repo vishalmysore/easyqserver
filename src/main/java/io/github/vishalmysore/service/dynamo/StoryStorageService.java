@@ -4,6 +4,7 @@ import io.github.vishalmysore.data.Story;
 import io.github.vishalmysore.service.base.StoryDBService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.exception.SdkException;
@@ -15,7 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@Service("storyStorageService")
+@Service("storyDBService")
+@ConditionalOnProperty(name = "easyQZ_DBTYPE", havingValue = "aws", matchIfMissing = true)
 public class StoryStorageService extends AWSDynamoService implements StoryDBService {
     protected static final String TABLE_NAME = "stories";
 

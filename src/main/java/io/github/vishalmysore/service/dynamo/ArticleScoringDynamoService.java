@@ -6,6 +6,7 @@ import io.github.vishalmysore.data.Score;
 import io.github.vishalmysore.service.base.ArticleScoringDBService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.exception.SdkException;
@@ -15,7 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@Service
+@Service ("articleScoringDBService")
+@ConditionalOnProperty(name = "easyQZ_DBTYPE", havingValue = "aws", matchIfMissing = true)
 public class ArticleScoringDynamoService extends AWSDynamoService implements ArticleScoringDBService {
     protected static final String ARTICLESCORE_TABLE_NAME = "articlescores";
 
@@ -162,12 +164,5 @@ public class ArticleScoringDynamoService extends AWSDynamoService implements Art
         return mapToLink(item);
     }
 
-    public Link mapToLink(Map<String, AttributeValue> item) {
-        return new Link(
-                item.get("url").s(),
-                item.get("author").s(),
-                Integer.parseInt(item.get("totalAccessCount").n()),
-                item.get("keywords").s()
-        );
-    }
+
 }

@@ -4,8 +4,10 @@ import java.util.concurrent.CompletableFuture;
 
 public interface UserLoginDBSrvice {
 
-    public boolean updateUser(String userId);
-    public boolean createTempUser(String userId, String emailId, String ipAddress);
+    public boolean makeUserPermanent(String userId, String emailId);
+    public boolean createTempUser(String userId, String emailId, String ipAddress, String avatar);
     public void trackUserLogin(String userId, String emailId, String ipAddress);
     public CompletableFuture<Integer> insertUsageData(String restCallId, String ipAddress, String timestamp);
+
+    public void recordUserLogout(String userId);
 }

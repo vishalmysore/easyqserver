@@ -7,6 +7,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -23,8 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service("awsDynamoService")
+@Service("dbService")
 @Slf4j
+@ConditionalOnProperty(name = "easyQZ_DBTYPE", havingValue = "aws", matchIfMissing = true)
 public class AWSDynamoService implements BaseDBService {
 
     @Getter

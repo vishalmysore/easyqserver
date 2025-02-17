@@ -52,12 +52,15 @@ public class ResultsContoller {
         score.setUserId(userId);
         log.info("Getting results "+score);
         quizResultsDBService.insertScore(score,easyQScoreHandler);
+        articleScoringDBService.insertScore(score,easyQNotificationHandler);
         if(score.getQuizType().equals(QuizType.LINK)) {
-            articleScoringDBService.insertScore(score,easyQNotificationHandler);
             Link link = articleScoringDBService.getLinkByUrl(score.getUrl());
             score.setTopics(link.getKeywords());
-            notificationController.sendNotification("newTestTaken", score);
+        } else {
+            score.setUrl(score.getTopics());
         }
+
+        notificationController.sendNotification("newTestTaken", score);
 
         return score;
     }

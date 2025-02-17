@@ -15,4 +15,5 @@ public class GoogleUser {
     private String name;
     private String createdTimestamp;  // Added timestamp for creation
     private String easyQZUserId;
+    private String loginTime;
 }
