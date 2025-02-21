@@ -1,13 +1,12 @@
 package io.github.vishalmysore.service.mongo;
 
 import io.github.vishalmysore.data.Score;
+import io.github.vishalmysore.data.UserPerformance;
+import io.github.vishalmysore.data.UserPerformanceData;
 import io.github.vishalmysore.data.mongo.ArticleDetails;
 import io.github.vishalmysore.data.mongo.ArticleScore;
-import io.github.vishalmysore.data.UserPerformance;
 import io.github.vishalmysore.service.base.UserAnalyticsDBService;
-import io.github.vishalmysore.service.mongo.repo.ArticleScoreRepository;
-import io.github.vishalmysore.service.mongo.repo.LoginUserRepository;
-import io.github.vishalmysore.service.mongo.repo.UserScoreRepository;
+import io.github.vishalmysore.service.mongo.repo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -22,16 +21,23 @@ public class UserAnalyticsMongoService implements UserAnalyticsDBService {
     private final UserScoreRepository userScoreRepository;
 
     private final LoginUserRepository loginUserRepository;
+    private final UserAnalyticsRepository userAnalyticsRepository;
 
+    private final UserPerformanceDataRepository userPerformanceDataRepository;
     @Autowired
-    public UserAnalyticsMongoService(ArticleScoreRepository articleScoreRepository, UserScoreRepository userScoreRepository, LoginUserRepository loginUserRepository) {
+    public UserAnalyticsMongoService(ArticleScoreRepository articleScoreRepository, UserScoreRepository userScoreRepository, LoginUserRepository loginUserRepository,UserAnalyticsRepository userAnalyticsRepository,UserPerformanceDataRepository userPerformanceDataRepository) {
         this.articleScoreRepository = articleScoreRepository;
         this.userScoreRepository = userScoreRepository;
         this.loginUserRepository = loginUserRepository;
+        this.userAnalyticsRepository = userAnalyticsRepository;
+        this.userPerformanceDataRepository = userPerformanceDataRepository;
     }
 
+
+
+
     @Override
-    public UserPerformance getUserAnalytics(String userId) {
+    public UserPerformance buildUserAnalytics(String userId) {
         // Fetch ArticleScores for the given user
         List<ArticleScore> articleScores = articleScoreRepository.findByUserId(userId);
 
@@ -138,7 +144,27 @@ public class UserAnalyticsMongoService implements UserAnalyticsDBService {
         userPerformance.setOverallWrongAnswers(overallWrongAnswers);
         userPerformance.setStrongAreas(strongAreas);
         userPerformance.setWeakAreas(weakAreas);
-
+        userAnalyticsRepository.save(userPerformance);
         return userPerformance;
+    }
+
+    @Override
+    public void updateUserAnalytics(UserPerformance userPerformance) {
+        userAnalyticsRepository.save(userPerformance);
+    }
+    @Override
+    public void updateUserPerformanceData(UserPerformanceData userPerformance) {
+        userPerformanceDataRepository.save(userPerformance);
+    }
+
+    @Override
+    public UserPerformance getUserAnalytics(String userId) {
+        return userAnalyticsRepository.findByUserId(userId)
+                .orElse(null);
+    }
+    @Override
+    public UserPerformanceData getUserPerformanceData(String userId) {
+        return userPerformanceDataRepository.findByUserId(userId)
+                .orElse(null);
     }
 }

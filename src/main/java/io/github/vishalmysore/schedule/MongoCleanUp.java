@@ -2,10 +2,12 @@ package io.github.vishalmysore.schedule;
 
 import io.github.vishalmysore.data.mongo.DocumentLink;
 import io.github.vishalmysore.data.mongo.LoginUser;
+import io.github.vishalmysore.rag.RAGService;
 import io.github.vishalmysore.service.mongo.repo.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -27,8 +29,13 @@ public class MongoCleanUp {
     private final ArticleScoreRepository articleScoreRepository;
     private final StoryRepository storyRepository;
     private final UserScoreRepository userScoreRepository;
+    private final UserAnalyticsRepository userAnalyticsRepository;
+    private final UserPerformanceDataRepository userPerformanceDataRepository;
 
     private final LinkRepository linkRepository;
+
+    @Autowired
+    private RAGService ragService;
 
     @PostConstruct
     public void runAtStartup() {
@@ -73,13 +80,20 @@ public class MongoCleanUp {
         storyRepository.deleteByUserIdIn(userIds);  // Delete stories too
         log.info("Deleting UserScores for users: {}", userIds);
         userScoreRepository.deleteByUserIdIn(userIds);
-        log.info("Deleting temporary unverified users: {}", userIds);
+        log.info("Deleting UserAnalytics for users: {}", userIds);
+        userAnalyticsRepository.deleteByUserIdIn(userIds);
+        log.info("Deleting UserPerformanceData for users: {}", userIds);
+        userPerformanceDataRepository.deleteByUserIdIn(userIds);
 
+        log.info("Purging the RAG");
+        ragService.purgeData(userIds);
+        log.info("Deleting temporary unverified users: {}", userIds);
         // Delete temp users
         loginUserRepository.deleteByUserIdIn(userIds);
 
+
         log.info("Cleanup complete.");
-        log.info("Cleanup complete.");
+
     }
 
     @Transactional
