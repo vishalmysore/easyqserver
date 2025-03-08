@@ -2,7 +2,10 @@ package io.github.vishalmysore.service.mongo;
 
 import io.github.vishalmysore.data.UsageData;
 import io.github.vishalmysore.service.base.UserLoginDBSrvice;
+import io.github.vishalmysore.service.mongo.repo.LoginUserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.Document;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
@@ -20,6 +24,14 @@ import java.util.concurrent.CompletableFuture;
 @ConditionalOnProperty(name = "easyQZ_DBTYPE", havingValue = "mongo", matchIfMissing = true)
 public class UserLoginMongoService extends MongoService implements UserLoginDBSrvice {
 
+    @Autowired
+    private  LoginUserRepository loginUserRepository;
+
+    @Override
+    public String getAvtaarByUserId(String userId) {
+        Optional<Document> result = loginUserRepository.findAvatarByUserId(userId);
+        return result.map(doc -> doc.getString("avatar")).orElse(null);
+    }
 
     @Async
     @Override

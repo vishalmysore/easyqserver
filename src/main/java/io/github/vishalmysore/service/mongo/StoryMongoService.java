@@ -1,9 +1,11 @@
 package io.github.vishalmysore.service.mongo;
 
 import io.github.vishalmysore.data.Story;
+import io.github.vishalmysore.service.LLMService;
 import io.github.vishalmysore.service.base.StoryDBService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,13 @@ import java.time.format.DateTimeFormatter;
 @Slf4j
 @ConditionalOnProperty(name = "easyQZ_DBTYPE", havingValue = "mongo", matchIfMissing = true)
 public class StoryMongoService extends MongoService implements StoryDBService {
+
+    @Override
+    @Cacheable(value = "stories", key = "#prompt")
+    public String createStory(String prompt, LLMService llm) {
+        log.info("Cache miss creating story: " + prompt);
+        return llm.callLLM(prompt);
+    }
     @Async
     public void insertStory(Story story) {
         try {

@@ -1,0 +1,112 @@
+[
+    {
+        "questionId": 1,
+        "questionText": "What is the correct way to declare a variable in Java?",
+        "answerChoices": [
+            "int 1x = 10;",
+            "int x1 = 10;",
+            "int x 1 = 10;",
+            "1int x = 10;"
+        ],
+        "correctAnswer": "int x1 = 10;"
+    },
+    {
+        "questionId": 2,
+        "questionText": "Which of the following is a valid declaration of an array in Java?",
+        "answerChoices": [
+            "int arr[] = new int[5];",
+            "int arr = new int[5];",
+            "int[] arr = new int(5);",
+            "int arr[5];"
+        ],
+        "correctAnswer": "int arr[] = new int[5];"
+    },
+    {
+        "questionId": 3,
+        "questionText": "Which keyword is used to create a subclass in Java?",
+        "answerChoices": [
+            "extends",
+            "implements",
+            "inherits",
+            "super"
+        ],
+        "correctAnswer": "extends"
+    },
+    {
+        "questionId": 4,
+        "questionText": "What is the default value of a boolean variable in Java?",
+        "answerChoices": [
+            "true",
+            "false",
+            "0",
+            "null"
+        ],
+        "correctAnswer": "false"
+    },
+    {
+        "questionId": 5,
+        "questionText": "Which of the following is not a primitive data type in Java?",
+        "answerChoices": [
+            "int",
+            "boolean",
+            "String",
+            "char"
+        ],
+        "correctAnswer": "String"
+    },
+    {
+        "questionId": 6,
+        "questionText": "What is the purpose of the 'main' method in a Java application?",
+        "answerChoices": [
+            "To define the entry point of the application.",
+            "To create objects.",
+            "To start threads.",
+            "To handle exceptions."
+        ],
+        "correctAnswer": "To define the entry point of the application."
+    },
+    {
+        "questionId": 7,
+        "questionText": "Which of the following statements is used to import packages in Java?",
+        "answerChoices": [
+            "import package_name;",
+            "using package_name;",
+            "include package_name;",
+            "require package_name;"
+        ],
+        "correctAnswer": "import package_name;"
+    },
+    {
+        "questionId": 8,
+        "questionText": "What does JVM stand for?",
+        "answerChoices": [
+            "Java Variable Machine",
+            "Java Virtual Machine",
+            "Java Verified Machine",
+            "Java Version Machine"
+        ],
+        "correctAnswer": "Java Virtual Machine"
+    },
+    {
+        "questionId": 9,
+        "questionText": "Which statement is used to terminate a loop in Java?",
+        "answerChoices": [
+            "exit;",
+            "break;",
+            "stop;",
+            "return;"
+        ],
+        "correctAnswer": "break;"
+    },
+    {
+        "questionId": 10,
+        "questionText": "What is the output of the following code: System.out.println(5 + 5 + '5');?",
+        "answerChoices": [
+            "55",
+            "105",
+            "10",
+            "Error"
+        ],
+        "correctAnswer": "105"
+    }
+]

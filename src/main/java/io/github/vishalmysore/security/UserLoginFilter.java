@@ -4,6 +4,7 @@ import io.github.vishalmysore.service.base.UserLoginDBSrvice;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -107,7 +108,12 @@ public class UserLoginFilter implements Filter {
 
         } else {
             log.warn("No JWT token found in the request.");
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token missing or expired.");
+
+            // Set Unauthorized status with a message instead of throwing an exception
+            HttpServletResponse httpResponse = (HttpServletResponse) response;
+            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            httpResponse.getWriter().write("Token missing or expired.");
+            return;
         }
         chain.doFilter(request, response);
     }

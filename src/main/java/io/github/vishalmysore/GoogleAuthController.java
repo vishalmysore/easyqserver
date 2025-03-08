@@ -61,6 +61,7 @@ public class GoogleAuthController {
             googleDBService.updateLoginAndLogoutTime(googleUser.getEmail(),GoogleDynamoService.LOGIN_TIME);
         }
         userLoginDBService.makeUserPermanent(userId,googleUser.getEmail());
+        String avtaar = userLoginDBService.getAvtaarByUserId(userId);
 //        String userId = jwtUtil.getUserId(jwtToken);    //if user is not authenticated create a random and send
 //        log.info("User ID: " + userId);
 //        if(userId == null || userId.isEmpty()) {
@@ -74,7 +75,8 @@ public class GoogleAuthController {
         Map<String, String> response = new HashMap<>();
         response.put("jwtToken", newjwtToken);
         response.put("userId", userId);
-
+        response.put("avtaar", avtaar);
+        response.put("emailid",googleUser.getEmail());
         return ResponseEntity.ok(response);
     }
 

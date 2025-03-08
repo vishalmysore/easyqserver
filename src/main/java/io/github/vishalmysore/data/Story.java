@@ -19,4 +19,5 @@ public class Story {
     private String title;
     List<Question> questions;
     private String createdTimestamp;
+    private NewsBlast newsBlast;
 }

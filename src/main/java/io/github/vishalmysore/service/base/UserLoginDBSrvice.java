@@ -10,4 +10,6 @@ public interface UserLoginDBSrvice {
     public CompletableFuture<Integer> insertUsageData(String restCallId, String ipAddress, String timestamp);
 
     public void recordUserLogout(String userId);
+
+    public String getAvtaarByUserId(String userId);
 }

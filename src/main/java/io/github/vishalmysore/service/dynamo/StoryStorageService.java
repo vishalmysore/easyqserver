@@ -1,6 +1,7 @@
 package io.github.vishalmysore.service.dynamo;
 
 import io.github.vishalmysore.data.Story;
+import io.github.vishalmysore.service.LLMService;
 import io.github.vishalmysore.service.base.StoryDBService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,10 @@ public class StoryStorageService extends AWSDynamoService implements StoryDBServ
         super.init();
         createStoryTable();
 
+    }
+
+    public String createStory(String prompt, LLMService llm) {
+        return  null;
     }
     private void createStoryTable() {
         try {

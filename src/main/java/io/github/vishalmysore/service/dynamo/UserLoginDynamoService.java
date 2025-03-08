@@ -18,6 +18,11 @@ import java.util.concurrent.CompletableFuture;
 public class UserLoginDynamoService extends AWSDynamoService implements UserLoginDBSrvice {
 
     @Override
+    public String getAvtaarByUserId(String userId) {
+        return "default";
+
+    }
+    @Override
     public boolean makeUserPermanent(String userId,String emailId) {
         try {
             // Step 1: Check if the user exists

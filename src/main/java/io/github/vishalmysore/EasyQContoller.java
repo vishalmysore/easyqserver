@@ -12,6 +12,8 @@ import io.github.vishalmysore.service.base.BaseDBService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,44 +39,61 @@ public class EasyQContoller {
     @Qualifier("dbService")
     private BaseDBService baseDBService;
 
+    @Autowired
+    private CacheManager cacheManager;
+    @Value("${llmMode}")
+    private String llmMode;
 
-
+    @Autowired
+    private FileUtils fileUtils;
     @GetMapping("/getQuestions")
     public Quiz getQuestions(@RequestParam("prompt") String prompt, @RequestParam("difficulty")  int difficulty) {
         log.info("received "+prompt);
+        if(prompt.length() > 200) {
+            throw new RuntimeException(" invalid prompt ");
+        }
      String jsonQustions = null;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = (String) authentication.getPrincipal();  // Retrieve the userId set in the filter
-     String quizId= JsonUtils.generateUniqueIDForUser(userId);
-     if(prompt.startsWith("https://") || prompt.startsWith("http://")) {
+        String quizId = JsonUtils.generateUniqueIDForUser(userId);
+        if ("mock".equalsIgnoreCase(llmMode)) {
 
-         String webData = scraperService.scrape(prompt);
-          jsonQustions = llmService.buildQuestionsForLink(webData,difficulty);
-         if (jsonQustions.contains("```json") && jsonQustions.contains("```")) {
-             int startIndex = jsonQustions.indexOf("```json") + 7; // Move past ```json
-             int endIndex = jsonQustions.indexOf("```", startIndex); // Find closing ```
+            jsonQustions = fileUtils.readFromResource("fakeQuestions.txt");
 
-             if (endIndex != -1) {
-                 jsonQustions = jsonQustions.substring(startIndex, endIndex).trim();
 
-             }
-         }
-         baseDBService.saveOrUpdateLink(prompt,webData);
-         quizId = QuizType.LINK.toString()+"_"+quizId;
-     } else {
-         quizId = QuizType.TOPIC.toString()+"_"+quizId;
-         log.info("Prompt is not a link");
-         jsonQustions =  llmService.buildQuestionsForTopic(prompt,difficulty);
-         if (jsonQustions.contains("```json") && jsonQustions.contains("```")) {
-             int startIndex = jsonQustions.indexOf("```json") + 7; // Move past ```json
-             int endIndex = jsonQustions.indexOf("```", startIndex); // Find closing ```
+        } else if (llmMode == null || llmMode.isEmpty()) {
 
-             if (endIndex != -1) {
-                 jsonQustions = jsonQustions.substring(startIndex, endIndex).trim();
+            if (prompt.startsWith("https://") || prompt.startsWith("http://")) {
 
-             }
-         }
-     }
+                //String webData = getScrapedData(prompt);
+                String webData = scraperService.scrape(prompt);
+                jsonQustions = llmService.buildQuestionsForLink(webData, difficulty);
+                if (jsonQustions.contains("```json") && jsonQustions.contains("```")) {
+                    int startIndex = jsonQustions.indexOf("```json") + 7; // Move past ```json
+                    int endIndex = jsonQustions.indexOf("```", startIndex); // Find closing ```
+
+                    if (endIndex != -1) {
+                        jsonQustions = jsonQustions.substring(startIndex, endIndex).trim();
+
+                    }
+                }
+                baseDBService.saveOrUpdateLink(prompt, webData);
+                quizId = QuizType.LINK.toString() + "_" + quizId;
+            } else {
+                quizId = QuizType.TOPIC.toString() + "_" + quizId;
+                log.info("Prompt is not a link");
+                jsonQustions = llmService.buildQuestionsForTopic(prompt, difficulty);
+                if (jsonQustions.contains("```json") && jsonQustions.contains("```")) {
+                    int startIndex = jsonQustions.indexOf("```json") + 7; // Move past ```json
+                    int endIndex = jsonQustions.indexOf("```", startIndex); // Find closing ```
+
+                    if (endIndex != -1) {
+                        jsonQustions = jsonQustions.substring(startIndex, endIndex).trim();
+
+                    }
+                }
+            }
+        }
         List<Question> questions = new ArrayList<>();
         try {
             // Assuming jsonQuestions is now a JSON string containing an array of questions
@@ -102,6 +121,7 @@ public class EasyQContoller {
 
      return quiz;
     }
+
 
     @GetMapping("/getTrendingLastHour")
     public List<Link> getTrendingLastHour() {

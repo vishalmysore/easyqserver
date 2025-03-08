@@ -7,6 +7,7 @@ import com.microsoft.playwright.Playwright;
 import lombok.extern.java.Log;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -15,10 +16,10 @@ import java.io.IOException;
 @Log
 @Service
 public class ScraperService {
-
+    @Cacheable(value = "scrapedData", key = "#url")
     public String scrape(String url){
         try {
-            log.info("Scraping URL: " + url);
+            log.info("Cache miss Scraping URL: " + url);
             // Fetch the webpage
             Document document = Jsoup.connect(url).get();
 

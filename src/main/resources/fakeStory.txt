@@ -1,0 +1,88 @@
+```json
+{
+  "title": "The Whispering Woods",
+  "storyText": "In the small town of Eldridge, a thick forest loomed at the edge, known as the Whispering Woods. Locals spoke in hushed tones about the strange sounds that could be heard emanating from the trees at twilight. It was said that those who ventured too deep would never return, their whispers mingling with the rustling leaves, calling for help that would never come.\n\nOne chilly autumn evening, a curious boy named Ben decided to explore the woods, ignoring the warnings of his friends. Armed with nothing but a flashlight and a sense of adventure, he stepped beyond the familiar boundaries of the town. As he entered the forest, the sunlight faded and a chilling wind swept through the trees, causing the branches to creak ominously.\n\nThe deeper he went, the more he heard the whispers. At first, they were soft and indistinct, but as he pressed on, they grew louder, more insistent. \"Help us... help us...\" they pleaded, echoing through the woods. Ben's heart raced, but his curiosity pushed him further. He followed the sounds until he found a clearing, where the moonlight illuminated a strange stone altar covered in moss.\n\nSuddenly, the whispers stopped, replaced by an eerie silence. Ben felt a chill run down his spine and turned to leave, but the path behind him had vanished. Panic surged through him. He was trapped. The whispers returned, now sounding more like laughter, echoing around him. \"Join us... join us...\" they taunted.\n\nIn a desperate attempt to escape, Ben ran in every direction, but the trees seemed to close in around him, their gnarled branches reaching out like skeletal fingers. Just as hope began to fade, he spotted a beam of light through the trees. He sprinted toward it, pushing through the underbrush until he burst out onto the familiar path leading back to town.\n\nBreathless, he turned to look back at the woods, heart pounding. The whispers had faded, but he could still feel their presence lingering, a shadow of what he had encountered. From that day on, Ben never spoke of his experience, but he could never forget the chilling laughter that echoed in his mind every twilight. The Whispering Woods remained, a dark mystery that held secrets best left undisturbed.",
+  "questions": [
+    {
+      "questionId": 1,
+      "questionText": "What is the name of the forest in the story?",
+      "answerChoices": ["The Whispering Woods", "The Dark Forest", "The Haunted Grove", "The Silent Woods"],
+      "correctAnswer": "The Whispering Woods",
+      "explanation": "The forest is specifically named 'The Whispering Woods' in the story.",
+      "userAnswer": ""
+    },
+    {
+      "questionId": 2,
+      "questionText": "Who is the main character of the story?",
+      "answerChoices": ["Tom", "Ben", "Eli", "Sam"],
+      "correctAnswer": "Ben",
+      "explanation": "Ben is identified as the curious boy who explores the woods.",
+      "userAnswer": ""
+    },
+    {
+      "questionId": 3,
+      "questionText": "What do the whispers in the woods ask for?",
+      "answerChoices": ["To play", "To help", "To leave", "To join them"],
+      "correctAnswer": "To help",
+      "explanation": "The whispers initially plead for help as noted in the story.",
+      "userAnswer": ""
+    },
+    {
+      "questionId": 4,
+      "questionText": "What happens when Ben reaches the clearing?",
+      "answerChoices": ["He finds treasure", "The whispers stop", "He sees a ghost", "He gets lost"],
+      "correctAnswer": "The whispers stop",
+      "explanation": "The story mentions that the whispers stopped when Ben reached the clearing.",
+      "userAnswer": ""
+    },
+    {
+      "questionId": 5,
+      "questionText": "What does Ben feel when he realizes he is trapped?",
+      "answerChoices": ["Excitement", "Joy", "Panic", "Curiosity"],
+      "correctAnswer": "Panic",
+      "explanation": "Ben experiences panic when he realizes he cannot find the way back.",
+      "userAnswer": ""
+    },
+    {
+      "questionId": 6,
+      "questionText": "What do the trees seem to do as Ben tries to escape?",
+      "answerChoices": ["Help him", "Close in around him", "Disappear", "Turn into animals"],
+      "correctAnswer": "Close in around him",
+      "explanation": "The story describes the trees as closing in around Ben as he tries to escape.",
+      "userAnswer": ""
+    },
+    {
+      "questionId": 7,
+      "questionText": "What does Ben see that gives him hope?",
+      "answerChoices": ["A house", "A beam of light", "A friend", "A path"],
+      "correctAnswer": "A beam of light",
+      "explanation": "Ben spots a beam of light through the trees, which leads him back to town.",
+      "userAnswer": ""
+    },
+    {
+      "questionId": 8,
+      "questionText": "How does the story describe the laughter of the whispers?",
+      "answerChoices": ["Joyful", "Eerie", "Sad", "Angry"],
+      "correctAnswer": "Eerie",
+      "explanation": "The laughter is described as eerie, adding to the horror of the story.",
+      "userAnswer": ""
+    },
+    {
+      "questionId": 9,
+      "questionText": "What does Ben do after he escapes the woods?",
+      "answerChoices": ["Tells everyone about his adventure", "Forgets about it", "Never speaks of his experience", "Goes back in"],
+      "correctAnswer": "Never speaks of his experience",
+      "explanation": "Ben chooses to keep his experience a secret from others after escaping.",
+      "userAnswer": ""
+    },
+    {
+      "questionId": 10,
+      "questionText": "What remains after Ben's encounter with the woods?",
+      "answerChoices": ["The treasure", "A dark mystery", "His friends", "The laughter"],
+      "correctAnswer": "A dark mystery",
+      "explanation": "The story concludes with the woods remaining a dark mystery that holds secrets.",
+      "userAnswer": ""
+    }
+  ]
+}
+```

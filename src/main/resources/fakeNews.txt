@@ -1,0 +1,88 @@
+```json
+{
+  "title": "US Economic Update - February 2024",
+  "storyText": "The US economy experienced a mixed month in February 2024, with a total of 151,000 new jobs added. The unemployment rate, however, saw a slight increase, rising to 4.1%. This shift has raised concerns among economists regarding the overall stability and direction of the economy. Treasury Secretary Bessent commented on the current economic climate, suggesting that the economy might be 'starting to roll a little bit,' indicating a glimmer of optimism amidst uncertainty. However, Federal Reserve Chair has warned that the economy is facing potential slowdown amid heightened uncertainty, which could impact future growth. The outlook on the economy remains clouded, especially with warnings from former Treasury Secretary under Trump about a 'detox period' that might lead to economic slowdown. In contrast, Wall Street made a notable recovery, reversing initial disappointment from the jobs report to swing into positive territory. Meanwhile, across the globe, Brazil's economy is projected to grow by 3.4% in 2024, although year-end weakness suggests fewer rate hikes in the future. On a more localized note, California's economy is forging ahead, as evidenced by the groundbreaking of Pacific Steel's new mill, marking the first steel mill in the state in 50 years. This development highlights regional economic resilience despite broader national concerns. The Treasury Secretary noted that the economy may slow down as the nation shifts away from public spending, further complicating the economic landscape. In summary, while there are signs of growth in certain sectors, underlying uncertainties and potential slowdowns necessitate cautious observation of the US economy's trajectory.",
+  "questions": [
+    {
+      "questionId": 1,
+      "questionText": "How many jobs did the US economy add last month?",
+      "answerChoices": ["100,000", "151,000", "200,000", "250,000"],
+      "correctAnswer": "151,000",
+      "explanation": "The US economy added 151,000 jobs in February 2024.",
+      "userAnswer": ""
+    },
+    {
+      "questionId": 2,
+      "questionText": "What was the unemployment rate last month?",
+      "answerChoices": ["3.5%", "4.1%", "4.5%", "5.0%"],
+      "correctAnswer": "4.1%",
+      "explanation": "The unemployment rate rose to 4.1% last month.",
+      "userAnswer": ""
+    },
+    {
+      "questionId": 3,
+      "questionText": "Who is the current Treasury Secretary mentioned in the news?",
+      "answerChoices": ["Janet Yellen", "Bessent", "Steven Mnuchin", "Jay Powell"],
+      "correctAnswer": "Bessent",
+      "explanation": "Treasury Secretary Bessent provided the commentary on the economy.",
+      "userAnswer": ""
+    },
+    {
+      "questionId": 4,
+      "questionText": "What term did the former Trump Treasury Secretary use to describe the economic slowdown?",
+      "answerChoices": ["Detox period", "Recession", "Economic downturn", "Adjustment phase"],
+      "correctAnswer": "Detox period",
+      "explanation": "The term 'detox period' was used to describe the slowdown.",
+      "userAnswer": ""
+    },
+    {
+      "questionId": 5,
+      "questionText": "What did Wall Street do in response to the jobs report?",
+      "answerChoices": ["Dropped significantly", "Remained unchanged", "Reversed disappointment", "Plummeted"],
+      "correctAnswer": "Reversed disappointment",
+      "explanation": "Wall Street reversed initial disappointment to swing into positive territory.",
+      "userAnswer": ""
+    },
+    {
+      "questionId": 6,
+      "questionText": "What is the projected growth rate for Brazil's economy in 2024?",
+      "answerChoices": ["2.0%", "3.0%", "3.4%", "4.5%"],
+      "correctAnswer": "3.4%",
+      "explanation": "Brazil's economy is projected to grow by 3.4% in 2024.",
+      "userAnswer": ""
+    },
+    {
+      "questionId": 7,
+      "questionText": "What significant construction project is mentioned in California's economy?",
+      "answerChoices": ["New airport", "New steel mill", "New highway", "New university"],
+      "correctAnswer": "New steel mill",
+      "explanation": "Pacific Steel is breaking ground on California's first new steel mill in 50 years.",
+      "userAnswer": ""
+    },
+    {
+      "questionId": 8,
+      "questionText": "What might cause the economy to slow according to Bessent?",
+      "answerChoices": ["Increased public spending", "Shift away from public spending", "Higher taxes", "Global trade agreements"],
+      "correctAnswer": "Shift away from public spending",
+      "explanation": "Bessent mentioned that the economy may slow due to a shift away from public spending.",
+      "userAnswer": ""
+    },
+    {
+      "questionId": 9,
+      "questionText": "Which economist warned about a potential slowdown due to heightened uncertainty?",
+      "answerChoices": ["Treasury Secretary Bessent", "Federal Reserve Chair", "Former Trump Treasury Secretary", "President Biden"],
+      "correctAnswer": "Federal Reserve Chair",
+      "explanation": "The Federal Reserve Chair warned about potential slowdown amid heightened uncertainty.",
+      "userAnswer": ""
+    },
+    {
+      "questionId": 10,
+      "questionText": "What was the context of the jobs report being described?",
+      "answerChoices": ["First jobs report under Biden", "First jobs report under Trump’s second term", "Monthly jobs report", "Annual jobs report"],
+      "correctAnswer": "First jobs report under Trump’s second term",
+      "explanation": "The jobs report was noted as the first full report under Trump’s second term.",
+      "userAnswer": ""
+    }
+  ]
+}
+```
