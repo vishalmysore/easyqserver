@@ -36,8 +36,8 @@ public class JwtUtil {
         return Jwts.builder()
                 .setSubject(userId)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000)) // 1 hour expiration
-                //.setExpiration(new Date(System.currentTimeMillis() + 1 * 30 * 1000)) // 1 minutes expiration for testing
+                .setExpiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000))
+               // .setExpiration(new Date(System.currentTimeMillis() + 1 * 30 * 1000)) // 1 minutes expiration for testing
                 .claim("tempUser", true)
                 .claim("tempUserId", userId)
                 .signWith(SignatureAlgorithm.HS256, secretKey)
